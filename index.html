@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Web</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo" onclick="showHome()">🎬 MovieWeb</div>
+            <div class="nav-links">
+                <button onclick="showHome()">Trang chủ</button>
+                <button onclick="showVouchers()">Voucher</button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Tìm kiếm phim...">
+            <button onclick="searchMovies()">Tìm kiếm</button>
+        </div>
+
+        <div class="genre-filter" id="genreFilter"></div>
+    </div>
+
+    <div class="movies-grid" id="moviesGrid">
+        <div class="loading">Đang tải phim...</div>
+    </div>
+
+    <div class="modal" id="movieModal">
+        <div class="modal-content" id="modalContent">
+            <button class="close-btn" onclick="closeModal()">x</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
