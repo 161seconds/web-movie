@@ -1,5 +1,5 @@
 // ========== API Configuration ==========
-const API_KEY = 'c45a857c193f6302f2b5061c3b85e743';
+const API_KEY = '';
 const API_BASE = 'https://api.themoviedb.org/3';
 const IMG_BASE = 'https://image.tmdb.org/t/p/w500';
 
