@@ -1,9 +1,15 @@
 // ========== API Configuration ==========
+<<<<<<< HEAD
 import {
     API_KEY,
     API_BASE,
     IMG_BASE
 } from './api.js';
+=======
+const API_KEY = '';
+const API_BASE = 'https://api.themoviedb.org/3';
+const IMG_BASE = 'https://image.tmdb.org/t/p/w500';
+>>>>>>> 6a88da00cce28b6650a5c2b2b4df37201958fbb4
 
 // ========== Data ==========
 const genres = [
@@ -797,6 +803,7 @@ function addConcession() {
         alert('⚠️ Vui lòng điền đầy đủ thông tin hợp lệ!');
     }
 }
+<<<<<<< HEAD
 
 // ========== Expose Functions to Window ==========
 window.login = login;
@@ -824,3 +831,5 @@ window.manageConcessions = manageConcessions;
 window.editConcession = editConcession;
 window.deleteConcession = deleteConcession;
 window.addConcession = addConcession;
+=======
+>>>>>>> 6a88da00cce28b6650a5c2b2b4df37201958fbb4
