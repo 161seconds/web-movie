@@ -5,39 +5,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movie Web</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-..." crossorigin="anonymous" />
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <header class="header">
-        <nav class="nav">
-            <div class="logo" onclick="showHome()">🎬 MovieWeb</div>
-            <div class="nav-links">
-                <button onclick="showHome()">Trang chủ</button>
-                <button onclick="showVouchers()">Voucher</button>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <h1 class="logo">B-FlixMovie</h1>
+            <h2>Đăng nhập</h2>
+            <div class="login-form">
+                <div class="form-group">
+                    <label>Tên đăng nhập:</label>
+                    <input type="text" id="loginUsername" placeholder="Nhập tên đăng nhập">
+                </div>
+                <div class="form-group">
+                    <label>Mật khẩu:</label>
+                    <input type="password" id="loginPassword" placeholder="Nhập mật khẩu"
+                        onkeypress="if(event.key==='Enter') window.login()">
+                </div>
+                <button class="btn btn-primary" onclick="window.login()" style="width: 100%;">Đăng nhập</button>
             </div>
-        </nav>
-    </header>
-
-    <div class="search-container">
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Tìm kiếm phim...">
-            <button onclick="searchMovies()">Tìm kiếm</button>
-        </div>
-
-        <div class="genre-filter" id="genreFilter"></div>
-    </div>
-
-    <div class="movies-grid" id="moviesGrid">
-        <div class="loading">Đang tải phim...</div>
-    </div>
-
-    <div class="modal" id="movieModal">
-        <div class="modal-content" id="modalContent">
-            <button class="close-btn" onclick="closeModal()">x</button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Main App -->
+    <div id="mainApp" style="display: none;">
+        <header class="header">
+            <nav class="nav">
+                <div class="logo" onclick="window.showHome()">B-FlixMovie</div>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm phim..."
+                        onkeypress="if(event.key==='Enter') window.searchMovies()">
+                    <i onclick="window.searchMovies()" class="btnSearch fa-solid fa-magnifying-glass"></i>
+                </div>
+                <div class="nav-links">
+                    <button onclick="window.showHome()">Trang chủ</button>
+                    <button onclick="window.showVouchers()">Khuyến mãi</button>
+                    <button id="ordersBtn" onclick="window.showOrders()">Đơn hàng</button>
+                    <button id="adminBtn" onclick="window.showAdmin()" style="display: none;">Quản lý</button>
+                    <div
+                        style="display: flex; align-items: center; gap: 1rem; margin-left: 1rem; padding-left: 1rem; border-left: 2px solid rgba(233, 69, 96, 0.3);">
+                        <span id="userDisplay" style="color: #f39c12; font-weight: bold;"></span>
+                        <button onclick="window.logout()" style="background: rgba(231, 76, 60, 0.3);">Đăng xuất</button>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <div class="search-container">
+
+
+            <div class="genre-filter" id="genreFilter"></div>
+        </div>
+
+        <div class="movies-grid" id="moviesGrid">
+            <div class="loading">Đang tải phim...</div>
+        </div>
+
+        <div class="modal" id="movieModal">
+            <div class="modal-content" id="modalContent"></div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
 </body>
+
 </html>
