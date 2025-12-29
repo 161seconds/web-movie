@@ -75,6 +75,11 @@ function login() {
     }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelector('.btn-primary').addEventListener('click', login);
+});
+
+
 function logout() {
     if (confirm('Bạn có chắc muốn đăng xuất?')) {
         currentUser = null;
