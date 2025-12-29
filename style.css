@@ -37,6 +37,7 @@ body {
     margin-bottom: 1rem;
     background: linear-gradient(45deg, #e94560, #f39c12);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -74,6 +75,7 @@ body {
     font-weight: bold;
     background: linear-gradient(45deg, #e94560, #f39c12);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     cursor: pointer;
     user-select: none;
@@ -141,8 +143,9 @@ body {
     outline: none;
     flex: 1;
     width: 100%;
-    padding: 1rem 1.2rem 1rem 1.2rem;
+    padding: 0.5rem 1.2rem 0.5rem 1.2rem;
     text-align: left;
+    margin-top: 1.5rem;
     border: 2px solid rgba(233, 69, 96, 0.5);
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.1);
@@ -172,6 +175,11 @@ body {
 
 .search-box button:hover {
     transform: scale(1.05);
+}
+
+.btnSearch.fa-solid.fa-magnifying-glass {
+    margin-left: 10rem;
+    margin-top: 0.7rem;
 }
 
 /* ========== Genre Filter ========== */
@@ -325,6 +333,7 @@ body {
     margin-bottom: 1rem;
     background: linear-gradient(45deg, #e94560, #f39c12);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 

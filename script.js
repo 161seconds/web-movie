@@ -36,8 +36,8 @@ const vouchers = [
 
 // User accounts (trong thực tế sẽ lưu trong database)
 const accounts = {
-    admin: { username: 'admin', password: 'admin123', role: 'admin', name: 'Admin' },
-    user: { username: 'user', password: 'user123', role: 'user', name: 'User' }
+    admin: { username: 'admin', password: '123', role: 'admin', name: 'Admin' },
+    user: { username: 'user', password: '123', role: 'user', name: 'User' }
 };
 
 // ========== State Management ==========
@@ -51,12 +51,19 @@ let orderId = 1;
 // ========== Initialize ==========
 document.addEventListener('DOMContentLoaded', () => {
     checkLogin();
+    const buttonLogin = document.querySelector('.btn.btn-primary');
+    buttonLogin.addEventListener('click', login);
 });
 
 // ========== Authentication ==========
 function login() {
     const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value;
+
+    if (typeof accounts === 'undefined') {
+        console.error("Dữ liệu tài khoản chưa được tải!");
+        return;
+    }
 
     if (!username || !password) {
         alert('Vui lòng nhập đầy đủ thông tin!');
@@ -75,9 +82,36 @@ function login() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelector('.btn-primary').addEventListener('click', login);
-});
+
+
+// window.login = function() {
+//     console.log('Login function called!');
+//     const username = document.getElementById('loginUsername').value.trim();
+//     const password = document.getElementById('loginPassword').value;
+
+//     console.log('Username:', username, 'Password:', password);
+
+//     if (!username || !password) {
+//         alert('Vui lòng nhập đầy đủ thông tin!');
+//         return;
+//     }
+
+//     const account = accounts[username];
+
+//     if (account && account.password === password) {
+//         currentUser = account;
+//         console.log('Login successful!', currentUser);
+//         document.getElementById('loginScreen').style.display = 'none';
+//         document.getElementById('mainApp').style.display = 'block';
+//         initApp();
+//     } else {
+//         alert('Tên đăng nhập hoặc mật khẩu không đúng!');
+//     }
+// }
+
+// document.addEventListener('DOMContentLoaded', () => {
+//     document.querySelector('.btn-primary').addEventListener('click', login);
+// });
 
 
 function logout() {
@@ -107,7 +141,7 @@ function initApp() {
     } else {
         document.getElementById('adminBtn').style.display = 'none';
     }
-    
+
     initGenres();
     loadMovies();
 }
@@ -133,7 +167,7 @@ function filterByGenre(genreId, el) {
     if (el) {
         el.classList.add('active');
     }
-    
+
     loadMovies(genreId);
 }
 
