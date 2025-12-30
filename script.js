@@ -47,13 +47,15 @@ let selectedSeats = [];
 let concessionCart = {};
 let orders = [];
 let orderId = 1;
-
+let currentMovieTitle = '';
 // ========== Initialize ==========
 document.addEventListener('DOMContentLoaded', () => {
     checkLogin();
     const buttonLogin = document.querySelector('.btn.btn-primary');
     buttonLogin.addEventListener('click', login);
 });
+
+
 
 // ========== Authentication ==========
 function login() {
@@ -82,38 +84,6 @@ function login() {
     }
 }
 
-
-
-// window.login = function() {
-//     console.log('Login function called!');
-//     const username = document.getElementById('loginUsername').value.trim();
-//     const password = document.getElementById('loginPassword').value;
-
-//     console.log('Username:', username, 'Password:', password);
-
-//     if (!username || !password) {
-//         alert('Vui lòng nhập đầy đủ thông tin!');
-//         return;
-//     }
-
-//     const account = accounts[username];
-
-//     if (account && account.password === password) {
-//         currentUser = account;
-//         console.log('Login successful!', currentUser);
-//         document.getElementById('loginScreen').style.display = 'none';
-//         document.getElementById('mainApp').style.display = 'block';
-//         initApp();
-//     } else {
-//         alert('Tên đăng nhập hoặc mật khẩu không đúng!');
-//     }
-// }
-
-// document.addEventListener('DOMContentLoaded', () => {
-//     document.querySelector('.btn-primary').addEventListener('click', login);
-// });
-
-
 function logout() {
     if (confirm('Bạn có chắc muốn đăng xuất?')) {
         currentUser = null;
@@ -134,7 +104,7 @@ function checkLogin() {
 
 // ========== Initialize App ==========
 function initApp() {
-    document.getElementById('userDisplay').textContent = `👤 ${currentUser.name}`;
+    document.getElementById('userDisplay').innerHTML = `<i class="fa-solid fa-user"></i> ${currentUser.name}`;
 
     if (currentUser.role === 'admin') {
         document.getElementById('adminBtn').style.display = 'block';
@@ -174,8 +144,12 @@ function filterByGenre(genreId, el) {
 // ========== Movies ==========
 async function loadMovies(genreId = null) {
     const moviesGrid = document.getElementById('moviesGrid');
-    moviesGrid.innerHTML = '<div class="loading">⏳ Đang tải phim...</div>';
-
+    moviesGrid.innerHTML = `
+    <div class="loading">
+        <i class="fa-solid fa-hourglass fa-spin"></i>
+        <p class="loading-text">Đang tải phim...</p>
+    </div>
+`;
     try {
         let url = `${API_BASE}/movie/popular?api_key=${API_KEY}&language=vi-VN&page=1`;
         if (genreId) {
@@ -186,7 +160,13 @@ async function loadMovies(genreId = null) {
         const data = await res.json();
         displayMovies(data.results);
     } catch (err) {
-        moviesGrid.innerHTML = '<div class="loading">❌ Không thể tải phim. Vui lòng thử lại.</div>';
+        moviesGrid.innerHTML = `
+    <div class="loading">
+        <i class="fa-solid fa-hourglass fa-spin"></i>
+        <p class="loading-text">Không thể tải phim. Vui lòng thử lại.</p>
+    </div>
+`;
+
     }
 }
 
@@ -194,7 +174,7 @@ function displayMovies(movies) {
     const moviesGrid = document.getElementById('moviesGrid');
 
     if (movies.length === 0) {
-        moviesGrid.innerHTML = '<div class="loading">Không tìm thấy phim nào.</div>';
+        moviesGrid.innerHTML = '<div class="loading"><i class="fa-solid fa-x"></i>Không tìm thấy phim nào.</div>';
         return;
     }
 
@@ -207,7 +187,7 @@ function displayMovies(movies) {
             <div class="movie-info">
                 <div class="movie-title">${movie.title}</div>
                 <div class="movie-rating">
-                    ⭐ ${movie.vote_average.toFixed(1)}
+                    <i class="fa-solid fa-star"></i> ${movie.vote_average.toFixed(1)}
                 </div>
             </div>
         </div>
@@ -222,14 +202,14 @@ async function searchMovies() {
     }
 
     const moviesGrid = document.getElementById('moviesGrid');
-    moviesGrid.innerHTML = '<div class="loading">🔍 Đang tìm kiếm...</div>';
+    moviesGrid.innerHTML = '<div class="loading"><i class="fa-solid fa-magnifying-glass"></i> Đang tìm kiếm...</div>';
 
     try {
         const res = await fetch(`${API_BASE}/search/movie?api_key=${API_KEY}&language=vi-VN&query=${encodeURIComponent(query)}`);
         const data = await res.json();
         displayMovies(data.results);
     } catch (err) {
-        moviesGrid.innerHTML = '<div class="loading">❌ Không thể tìm kiếm. Vui lòng thử lại.</div>';
+        moviesGrid.innerHTML = '<div class="loading"><i class="fa-solid fa-x"></i> Không thể tìm kiếm. Vui lòng thử lại.</div>';
     }
 }
 
@@ -238,7 +218,7 @@ async function showMovieDetail(movieId) {
     const content = document.getElementById('modalContent');
 
     modal.classList.add('active');
-    content.innerHTML = '<div class="loading">⏳ Đang tải thông tin...</div>';
+    content.innerHTML = '<div class="loading"><i class="fa-solid fa-hourglass"></i> Đang tải thông tin...</div>';
 
     try {
         const [movieRes, videosRes] = await Promise.all([
@@ -257,27 +237,27 @@ async function showMovieDetail(movieId) {
                      alt="${movie.title}" class="movie-detail-poster">
                 <div class="movie-detail-info">
                     <h2>${movie.title}</h2>
-                    <p><strong>⭐ Đánh giá:</strong> ${movie.vote_average.toFixed(1)}/10 (${movie.vote_count.toLocaleString()} votes)</p>
-                    <p><strong>📅 Ngày phát hành:</strong> ${movie.release_date}</p>
-                    <p><strong>⏱️ Thời lượng:</strong> ${movie.runtime} phút</p>
-                    <p><strong>🎭 Thể loại:</strong> ${movie.genres.map(g => g.name).join(', ')}</p>
-                    <p><strong>📝 Mô tả:</strong></p>
+                    <p><strong><i class="fa-solid fa-star"></i> Đánh giá:</strong> ${movie.vote_average.toFixed(1)}/10 (${movie.vote_count.toLocaleString()} votes)</p>
+                    <p><strong><i class="fa-solid fa-calendar"></i> Ngày phát hành:</strong> ${movie.release_date}</p>
+                    <p><strong><i class="fa-solid fa-stopwatch"></i> Thời lượng:</strong> ${movie.runtime} phút</p>
+                    <p><strong><i class="fa-solid fa-masks-theater"></i> Thể loại:</strong> ${movie.genres.map(g => g.name).join(', ')}</p>
+                    <p><strong>Mô tả:</strong></p>
                     <p style="text-align: justify;">${movie.overview || 'Chưa có mô tả'}</p>
                     <div class="action-buttons">
-                        <button class="btn btn-primary" onclick="window.showBooking(${movieId}, '${movie.title.replace(/'/g, "\\'")}')">🎟️ Đặt vé</button>
-                        <button class="btn btn-secondary" onclick="window.showConcession(${movieId}, '${movie.title.replace(/'/g, "\\'")}')">🍿 Đặt bắp nước</button>
+                        <button class="btn btn-primary" onclick="window.showBooking(${movieId}, '${movie.title.replace(/'/g, "\\'")}')"><i class="fa-solid fa-ticket"></i> Đặt vé</button>
+                        <button class="btn btn-secondary" onclick="window.showConcession(${movieId}, '${movie.title.replace(/'/g, "\\'")}')"> Đặt bắp nước</button>
                     </div>
                 </div>
             </div>
             ${trailer ? `
                 <div class="trailer-container">
-                    <h3>🎬 Trailer</h3>
+                    <h3><i class="fa-solid fa-clapperboard"></i> Trailer</h3>
                     <iframe src="https://www.youtube.com/embed/${trailer.key}" allowfullscreen></iframe>
                 </div>
             ` : '<p style="color: #aaa; margin-top: 2rem;">Không có trailer</p>'}
         `;
     } catch (err) {
-        content.innerHTML = '<div class="loading">❌ Không thể tải thông tin phim.</div>';
+        content.innerHTML = '<div class="loading"><i class="fa-solid fa-x"></i> Không thể tải thông tin phim.</div>';
     }
 }
 
@@ -292,16 +272,18 @@ function showHome() {
 
 // ========== Booking ==========
 function showBooking(movieId, movieTitle) {
+    currentMovieTitle = movieTitle;
+
     const content = document.getElementById('modalContent');
     selectedSeats = [];
 
     content.innerHTML = `
         <button class="close-btn" onclick="window.closeModal()">×</button>
-        <h2>🎟️ Đặt vé: ${movieTitle}</h2>
+        <h2><i class="fa-solid fa-ticket"></i> Đặt vé: ${movieTitle}</h2>
         <div class="booking-form">
             <div class="form-group">
-                <label>🏢 Chọn rạp:</label>
-                <select id="cinema">
+                <label><i class="fa-solid fa-building"></i> Chọn rạp:</label>
+                <select id="cinema" onchange="reloadBookedSeats(currentMovieTitle)">
                     <option>CGV Vincom Center</option>
                     <option>Lotte Cinema Diamond</option>
                     <option>Galaxy Nguyễn Du</option>
@@ -309,12 +291,12 @@ function showBooking(movieId, movieTitle) {
                 </select>
             </div>
             <div class="form-group">
-                <label>📅 Chọn ngày:</label>
-                <input type="date" id="date" min="${new Date().toISOString().split('T')[0]}">
+                <label><i class="fa-solid fa-calendar"></i> Chọn ngày:</label>
+                <input type="date" id="date" min="${new Date().toISOString().split('T')[0]}"onchange="reloadBookedSeats(currentMovieTitle)">
             </div>
             <div class="form-group">
-                <label>🕐 Chọn suất chiếu:</label>
-                <select id="showtime">
+                <label><i class="fa-solid fa-clock"></i> Chọn suất chiếu:</label>
+                <select id="showtime" onchange="reloadBookedSeats(currentMovieTitle)">
                     <option>09:00</option>
                     <option>11:30</option>
                     <option>14:00</option>
@@ -324,18 +306,18 @@ function showBooking(movieId, movieTitle) {
                 </select>
             </div>
             <div class="form-group">
-                <label>💺 Chọn ghế (<span id="seatCount">0</span> ghế):</label>
-                <div style="text-align: center; margin: 1rem 0; padding: 1rem; background: rgba(233, 69, 96, 0.2); border-radius: 10px; font-weight: bold; font-size: 1.1rem;">
-                    🖥️ MÀN HÌNH
+                <label><i class="fa-solid fa-couch"></i> Chọn ghế (<span id="seatCount">0</span> ghế):</label>
+                <div style="text-align: center; margin: 1rem 0; padding: 1rem; background: var(--cold-border); border-radius: 10px; font-weight: bold; font-size: 1.1rem;">
+                    <i class="fa-solid fa-display"></i> MÀN HÌNH
                 </div>
                 <div class="seat-selection" id="seatSelection"></div>
                 <div class="seat-legend">
                     <div class="legend-item">
-                        <div class="legend-box" style="background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(233, 69, 96, 0.3);"></div>
+                        <div class="legend-box" style="background: rgba(255, 255, 255, 0.1); border: 2px solid var(--cold-border);"></div>
                         <span>Trống</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-box" style="background: #e94560;"></div>
+                        <div class="legend-box" style="background: var(--cold-accent);"></div>
                         <span>Đã chọn</span>
                     </div>
                     <div class="legend-item">
@@ -344,10 +326,10 @@ function showBooking(movieId, movieTitle) {
                     </div>
                 </div>
             </div>
-            <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(243, 156, 18, 0.2); border-radius: 10px; font-size: 1.3rem; color: #f39c12; font-weight: bold; text-align: center;">
-                💰 Tổng tiền: <span id="totalPrice">0</span> VNĐ
+            <div style="margin-top: 1.5rem; padding: 1rem; background: var(--cold-main); border-radius: 10px; font-size: 1.3rem; color: var(--cold-main); font-weight: bold; text-align: center;">
+                <i class="fa-solid fa-wallet"></i> Tổng tiền: <span id="totalPrice">0</span> VNĐ
             </div>
-            <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="window.confirmBooking('${movieTitle.replace(/'/g, "\\'")}')">✅ Xác nhận đặt vé</button>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="window.confirmBooking('${movieTitle.replace(/'/g, "\\'")}')"><i class="fa-solid fa-check"></i> Xác nhận đặt vé</button>
         </div>
     `;
 
@@ -362,7 +344,7 @@ function generateSeats() {
     rows.forEach(row => {
         for (let i = 1; i <= 10; i++) {
             const seatId = `${row}${i}`;
-            const isTaken = Math.random() > 0.7;
+            const isTaken = false; // Mặc định tất cả ghế đều trống, sẽ cập nhật sau
             seats.push(`
                 <div class="seat ${isTaken ? 'taken' : ''}" 
                      data-seat="${seatId}" 
@@ -375,6 +357,42 @@ function generateSeats() {
 
     seatSelection.innerHTML = seats.join('');
 }
+
+async function loadBookedSeats(movie, cinema, date, showtime) {
+    const res = await fetch('./bookedChair.json');
+    const data = await res.json();
+
+    const booked = data.bookedChairs.filter(item =>
+        item.movie === movie &&
+        item.cinema === cinema &&
+        item.date === date &&
+        item.showtime === showtime
+    );
+
+    booked.forEach(item => {
+        item.seats.forEach(seat => {
+            const el = document.querySelector(`.seat[data-seat="${seat}"]`);
+            if (el) el.classList.add('booked');
+        });
+    });
+}
+
+function reloadBookedSeats(movieTitle) {
+    const cinema = document.getElementById('cinema').value;
+    const date = document.getElementById('date').value;
+    const showtime = document.getElementById('showtime').value;
+
+    if (!cinema || !date || !showtime) return;
+
+    document.querySelectorAll('.seat').forEach(seat => {
+        seat.classList.remove('booked');
+    });
+
+    loadBookedSeats(movieTitle, cinema, date, showtime);
+}
+
+window.reloadBookedSeats = reloadBookedSeats;
+
 
 function toggleSeat(seatId) {
     const seat = document.querySelector(`[data-seat="${seatId}"]`);
@@ -438,6 +456,9 @@ function confirmBooking(movieTitle) {
 
 // ========== Concession ==========
 function showConcession(movieId, movieTitle) {
+    const modal = document.getElementById('movieModal');
+    modal.classList.add('active');
+
     const content = document.getElementById('modalContent');
     concessionCart = {};
 
@@ -450,7 +471,7 @@ function showConcession(movieId, movieTitle) {
                 <div style="font-size: 1.4rem; color: #f39c12; font-weight: bold; text-align: center; margin-bottom: 1rem;">
                     💰 Tổng tiền: <span id="concessionTotal">0</span> VNĐ
                 </div>
-                <button class="btn btn-primary" style="width: 100%;" onclick="window.confirmConcession('${movieTitle.replace(/'/g, "\\'")}')">✅ Xác nhận đặt hàng</button>
+                <button class="btn btn-primary" style="width: 100%;" onclick="window.confirmConcession('${movieTitle.replace(/'/g, "\\'")}')"><i class="fa-solid fa-check"></i> Xác nhận đặt hàng</button>
             </div>
         </div>
     `;
@@ -614,8 +635,8 @@ function showOrders() {
                                     ${currentUser.role === 'admin' ? `
                                         <td>
                                             ${order.status === 'pending' ? `
-                                                <button class="btn btn-success" style="padding: 0.5rem 1rem; font-size: 0.85rem; margin-bottom: 0.3rem;" onclick="window.updateOrderStatus(${order.id}, 'completed')">✅ Hoàn thành</button>
-                                                <button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="window.updateOrderStatus(${order.id}, 'cancelled')">❌ Hủy</button>
+                                                <button class="btn btn-success" style="padding: 0.5rem 1rem; font-size: 0.85rem; margin-bottom: 0.3rem;" onclick="window.updateOrderStatus(${order.id}, 'completed')"><i class="fa-solid fa-check"></i> Hoàn thành</button>
+                                                <button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="window.updateOrderStatus(${order.id}, 'cancelled')"><i class="fa-solid fa-x"></i> Hủy</button>
                                             ` : '-'}
                                         </td>
                                     ` : ''}
@@ -633,7 +654,7 @@ function getStatusText(status) {
     const statusMap = {
         'pending': '⏳ Chờ xử lý',
         'completed': '✅ Hoàn thành',
-        'cancelled': '❌ Đã hủy'
+        'cancelled': '<i class="fa-solid fa-x"></i> Đã hủy'
     };
     return statusMap[status] || status;
 }
@@ -683,7 +704,7 @@ function showAdmin() {
                 </div>
                 <div class="stat-card">
                     <div class="stat-number">${completedOrders}</div>
-                    <div class="stat-label">✅ Hoàn thành</div>
+                    <div class="stat-label"><i class="fa-solid fa-check"></i> Hoàn thành</div>
                 </div>
             </div>
 
@@ -712,21 +733,21 @@ function manageVouchers() {
                     <div class="voucher-card">
                         <div class="voucher-code">${v.code}</div>
                         <div style="margin-bottom: 1rem;">${v.desc}</div>
-                        <button class="btn btn-danger" onclick="window.deleteVoucher(${i})">❌ Xóa</button>
+                        <button class="btn btn-danger" onclick="window.deleteVoucher(${i})"><i class="fa-solid fa-x"></i> Xóa</button>
                     </div>
                 `).join('')}
             </div>
-            <div style="margin-top: 2rem; padding: 2rem; background: rgba(233, 69, 96, 0.1); border-radius: 10px;">
-                <h3>➕ Thêm voucher mới</h3>
+            <div style="margin-top: 2rem; padding: 2rem; background: var(--cold-border); border: 2px solid var(--cold-border); border-radius: 10px;">
+                <h3><i class="fa-solid fa-plus"></i> Thêm voucher mới</h3>
                 <div class="form-group">
                     <label>Mã voucher:</label>
-                    <input type="text" id="newVoucherCode" placeholder="VD: MOVIE100">
+                    <input type="text" id="newVoucherCode"  placeholder="VD: MOVIE100">
                 </div>
                 <div class="form-group">
                     <label>Mô tả:</label>
                     <input type="text" id="newVoucherDesc" placeholder="VD: Giảm 100k cho đơn từ 300k">
                 </div>
-                <button class="btn btn-primary" onclick="window.addVoucher()">✅ Thêm voucher</button>
+                <button class="btn btn-primary" onclick="window.addVoucher()"><i class="fa-solid fa-check"></i> Thêm voucher</button>
             </div>
         </div>
     `;
@@ -759,7 +780,7 @@ function manageConcessions() {
 
     content.innerHTML = `
         <button class="close-btn" onclick="window.closeModal()">×</button>
-        <h2>🍿 Quản lý Bắp nước</h2>
+        <h2><i class="fa-solid fa-popcorn"></i> Quản lý Bắp nước</h2>
         <div class="admin-section">
             <table class="orders-table">
                 <thead>
@@ -786,7 +807,7 @@ function manageConcessions() {
             </table>
             
             <div style="margin-top: 2rem; padding: 2rem; background: rgba(233, 69, 96, 0.1); border-radius: 10px;">
-                <h3>➕ Thêm món mới</h3>
+                <h3><i class="fa-solid fa-plus"></i> Thêm món mới</h3>
                 <div class="form-group">
                     <label>Tên món:</label>
                     <input type="text" id="newConcessionName" placeholder="VD: Nachos phô mai">
@@ -795,7 +816,7 @@ function manageConcessions() {
                     <label>Giá (VNĐ):</label>
                     <input type="number" id="newConcessionPrice" placeholder="VD: 50000">
                 </div>
-                <button class="btn btn-primary" onclick="window.addConcession()">✅ Thêm món</button>
+                <button class="btn btn-primary" onclick="window.addConcession()"><i class="fa-solid fa-check"></i> Thêm món</button>
             </div>
         </div>
     `;

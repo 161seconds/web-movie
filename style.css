@@ -6,9 +6,17 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%);
     color: #fff;
     min-height: 100vh;
+}
+
+:root {
+    --cold-main: #3b82f6;
+    --cold-sub: #06b6d4;
+    --cold-accent: #6366f1;
+    --cold-border: rgba(59, 130, 246, 0.5);
+    --cold-border-light: rgba(125, 211, 252, 0.4);
 }
 
 /* ========== Login Screen ========== */
@@ -17,7 +25,9 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    background: linear-gradient(135deg,
+            rgba(15, 23, 42, 0.9),
+            rgba(2, 6, 23, 0.95));
 }
 
 .login-container {
@@ -29,13 +39,13 @@ body {
     max-width: 450px;
     width: 90%;
     text-align: center;
-    border: 2px solid rgba(233, 69, 96, 0.2);
+    border: 2px solid var(--cold-border);
 }
 
 .login-container h1 {
     font-size: 2.5rem;
     margin-bottom: 1rem;
-    background: linear-gradient(45deg, #e94560, #f39c12);
+    background: linear-gradient(45deg, var(--cold-main), var(--cold-sub));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -52,9 +62,11 @@ body {
 
 /* ========== Header ========== */
 .header {
-    background: rgba(0, 0, 0, 0.5);
+    background: linear-gradient(135deg,
+            rgba(15, 23, 42, 0.9),
+            rgba(2, 6, 23, 0.95));
     backdrop-filter: blur(10px);
-    padding: 1rem 2rem;
+    padding: 0rem 2rem;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -73,7 +85,7 @@ body {
 .logo {
     font-size: 2rem;
     font-weight: bold;
-    background: linear-gradient(45deg, #e94560, #f39c12);
+    background: linear-gradient(45deg, var(--cold-main), var(--cold-sub));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -101,7 +113,8 @@ body {
 }
 
 .nav-links button:hover {
-    background: rgba(233, 69, 96, 0.3);
+    background: linear-gradient(45deg, #3b82f6, #06b6d4);
+    border-color: #3b82f6;
     transform: translateY(-2px);
 }
 
@@ -146,7 +159,7 @@ body {
     padding: 0.5rem 1.2rem 0.5rem 1.2rem;
     text-align: left;
     margin-top: 1.5rem;
-    border: 2px solid rgba(233, 69, 96, 0.5);
+    border: 2px solid var(--cold-border);
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
@@ -161,16 +174,15 @@ body {
 .search-box input:focus {
     /* border-color: #e94560;
     background: rgba(255, 255, 255, 0.15); */
-    border-color: #e94560;
+    border-color: var(--cold-main);
     box-shadow:
-        0 0 5px rgba(233, 69, 96, 0.6),
-        0 0 15px rgba(233, 69, 96, 0.6),
-        0 0 30px rgba(233, 69, 96, 0.4);
+        0 0 8px rgba(59, 130, 246, 0.6),
+        0 0 20px rgba(59, 130, 246, 0.4);
 }
 
 
 .search-box input:hover {
-    border-color: rgba(233, 69, 96, 0.7);
+    border-color: var(--cold-main);
 }
 
 .search-box button:hover {
@@ -180,6 +192,22 @@ body {
 .btnSearch.fa-solid.fa-magnifying-glass {
     margin-left: 10rem;
     margin-top: 0.7rem;
+}
+
+/* ========== Loading ========== */
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 40px;
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.loading i {
+    font-size: 2rem;
 }
 
 /* ========== Genre Filter ========== */
@@ -193,7 +221,7 @@ body {
 .genre-btn {
     padding: 0.6rem 1.5rem;
     background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(233, 69, 96, 0.3);
+    border: 2px solid var(--cold-border);
     border-radius: 20px;
     color: #fff;
     cursor: pointer;
@@ -204,8 +232,8 @@ body {
 
 .genre-btn:hover,
 .genre-btn.active {
-    background: rgba(233, 69, 96, 0.5);
-    border-color: #e94560;
+    background: linear-gradient(45deg, var(--cold-main), var(--cold-sub));
+    border-color: var(--cold-main);
     transform: translateY(-2px);
 }
 
@@ -226,13 +254,13 @@ body {
     cursor: pointer;
     transition: all 0.3s;
     position: relative;
-    border: 2px solid rgba(233, 69, 96, 0.1);
+    border: 0.01px solid var(--cold-border);
 }
 
 .movie-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
-    border-color: rgba(233, 69, 96, 0.5);
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+    border-color: rgba(59, 130, 246, 0.6);
 }
 
 .movie-poster {
@@ -292,14 +320,14 @@ body {
     border-radius: 20px;
     padding: 2rem;
     position: relative;
-    border: 2px solid rgba(233, 69, 96, 0.2);
+    border: 2px solid var(--cold-border);
 }
 
 .close-btn {
     position: absolute;
     top: 1rem;
     right: 1rem;
-    background: rgba(233, 69, 96, 0.5);
+    background: linear-gradient(45deg, var(--cold-main), var(--cold-accent));
     border: none;
     color: #fff;
     font-size: 1.5rem;
@@ -311,7 +339,7 @@ body {
 }
 
 .close-btn:hover {
-    background: #e94560;
+    background: var(--cold-main);
     transform: rotate(90deg);
 }
 
@@ -331,7 +359,7 @@ body {
 .movie-detail-info h2 {
     font-size: 2rem;
     margin-bottom: 1rem;
-    background: linear-gradient(45deg, #e94560, #f39c12);
+    background: linear-gradient(45deg, var(--cold-main), var(--cold-sub));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -361,18 +389,18 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(45deg, #e94560, #f39c12);
+    background: linear-gradient(45deg, #3b82f6, #06b6d4);
     color: #fff;
 }
 
 .btn-secondary {
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
-    border: 2px solid rgba(233, 69, 96, 0.5);
+    border: 2px solid rgba(59, 130, 246, 0.6);
 }
 
 .btn-danger {
-    background: #e74c3c;
+    background: rgb(2, 2, 177);
     color: #fff;
 }
 
@@ -383,12 +411,42 @@ body {
 
 .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
 }
 
 .btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.fa-solid.fa-hourglass.fa-spin {
+    color: var(--cold-main);
+    margin-left: 63rem;
+    margin-top: 10rem;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 300px;
+    text-align: center;
+    color: #9bdcff;
+    width: 100%;
+}
+
+.loading i {
+    font-size: 2.5rem;
+}
+
+.loading-text {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-left: 63rem;
+    color: var(--cold-main);
+    white-space: nowrap;
 }
 
 /* ========== Trailer ========== */
@@ -400,7 +458,7 @@ body {
 
 .trailer-container h3 {
     margin-bottom: 1rem;
-    color: #f39c12;
+    color: var(--cold-accent);
 }
 
 .trailer-container iframe {
@@ -416,7 +474,7 @@ body {
     padding: 2rem;
     border-radius: 15px;
     margin-top: 2rem;
-    border: 2px solid rgba(233, 69, 96, 0.2);
+    /* border: 2px solid var(--cold-border); */
 }
 
 .form-group {
@@ -426,7 +484,8 @@ body {
 .form-group label {
     display: block;
     margin-bottom: 0.5rem;
-    color: #f39c12;
+    color: white;
+    font-style: italic;
     font-weight: 600;
 }
 
@@ -435,11 +494,17 @@ body {
 .form-group textarea {
     width: 100%;
     padding: 0.8rem;
-    border: 2px solid rgba(233, 69, 96, 0.5);
+    border: 2px solid var(--cold-border);
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
     font-size: 1rem;
+}
+
+.form-group input:focus {
+    border-color: var(--cold-main);
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.6),
+        0 0 20px rgba(59, 130, 246, 0.4);
 }
 
 .form-group select option {
@@ -460,10 +525,17 @@ body {
     margin: 1rem 0;
 }
 
+.seat.booked {
+    background: #444;
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
 .seat {
     aspect-ratio: 1;
     background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(233, 69, 96, 0.3);
+    border: 2px solid var(--cold-border-light);
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.3s;
@@ -474,12 +546,12 @@ body {
 }
 
 .seat:hover {
-    background: rgba(233, 69, 96, 0.3);
+    background: var(--cold-accent);
 }
 
 .seat.selected {
-    background: #e94560;
-    border-color: #e94560;
+    background: linear-gradient(45deg, var(--cold-main), var(--cold-sub));
+    border-color: varr(--cold-main);
 }
 
 .seat.taken {
@@ -553,17 +625,17 @@ body {
 }
 
 .voucher-card {
-    background: linear-gradient(135deg, rgba(233, 69, 96, 0.2), rgba(243, 156, 18, 0.2));
+    background: linear-gradient(135deg, var(--cold-border), var(--cold-sub));
     padding: 1.5rem;
     border-radius: 10px;
-    border: 2px dashed #e94560;
+    border: 2px solid var(--cold-main);
     position: relative;
 }
 
 .voucher-code {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #f39c12;
+    color: white;
     margin-bottom: 0.5rem;
 }
 
@@ -582,17 +654,19 @@ body {
 }
 
 .stat-card {
-    background: linear-gradient(135deg, rgba(233, 69, 96, 0.2), rgba(243, 156, 18, 0.2));
+    background: linear-gradient(135deg,
+            rgba(59, 130, 246, 0.25),
+            rgba(99, 102, 241, 0.25));
     padding: 2rem;
     border-radius: 15px;
     text-align: center;
-    border: 2px solid rgba(233, 69, 96, 0.3);
+    border: 2px solid var(--cold-main);
     transition: all 0.3s;
 }
 
 .stat-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+    box-shadow: 0 10px 30px var(--cold-border)
 }
 
 .stat-number {
@@ -612,7 +686,7 @@ body {
     padding: 2rem;
     border-radius: 15px;
     margin-bottom: 2rem;
-    border: 2px solid rgba(233, 69, 96, 0.2);
+    /* border: 2px solid var(--cold-border); */
 }
 
 .admin-section h2 {
