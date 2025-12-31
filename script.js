@@ -68,7 +68,7 @@ function login() {
     }
 
     if (!username || !password) {
-        alert('Vui lòng nhập đầy đủ thông tin!');
+        showAlert('Vui lòng nhập đầy đủ thông tin!');
         return;
     }
 
@@ -80,7 +80,7 @@ function login() {
         document.getElementById('mainApp').style.display = 'block';
         initApp();
     } else {
-        alert('Tên đăng nhập hoặc mật khẩu không đúng!');
+        showAlert('Tên đăng nhập hoặc mật khẩu không đúng!');
     }
 }
 
@@ -197,7 +197,7 @@ function displayMovies(movies) {
 async function searchMovies() {
     const query = document.getElementById('searchInput').value.trim();
     if (!query) {
-        alert('Vui lòng nhập từ khóa tìm kiếm!');
+        showAlert('Vui lòng nhập từ khóa tìm kiếm!');
         return;
     }
 
@@ -420,7 +420,7 @@ function updateTotalPrice() {
 
 function confirmBooking(movieTitle) {
     if (selectedSeats.length === 0) {
-        alert('⚠️ Vui lòng chọn ít nhất 1 ghế!');
+        showAlert('Vui lòng chọn ít nhất 1 ghế!');
         return;
     }
 
@@ -429,7 +429,7 @@ function confirmBooking(movieTitle) {
     const showtime = document.getElementById('showtime').value;
 
     if (!date) {
-        alert('⚠️ Vui lòng chọn ngày chiếu!');
+        showAlert('Vui lòng chọn ngày chiếu!');
         return;
     }
 
@@ -452,7 +452,7 @@ function confirmBooking(movieTitle) {
 
     orders.push(order);
 
-    alert(`✅ Đặt vé thành công!\n\n📋 Mã đơn: #${order.id}\n🎬 Phim: ${movieTitle}\n🏢 Rạp: ${cinema}\n📅 Ngày: ${date}\n🕐 Suất: ${showtime}\n💺 Ghế: ${selectedSeats.join(', ')}\n💰 Tổng tiền: ${total.toLocaleString()} VNĐ`);
+    showAlert(`✅ Đặt vé thành công!\n\n📋 Mã đơn: #${order.id}\n🎬 Phim: ${movieTitle}\n🏢 Rạp: ${cinema}\n📅 Ngày: ${date}\n🕐 Suất: ${showtime}\n💺 Ghế: ${selectedSeats.join(', ')}\n💰 Tổng tiền: ${total.toLocaleString()} VNĐ`);
     closeModal();
 }
 
@@ -532,7 +532,7 @@ function updateConcessionTotal() {
 function confirmConcession(movieTitle) {
     const items = Object.keys(concessionCart);
     if (items.length === 0) {
-        alert('⚠️ Vui lòng chọn ít nhất 1 món!');
+        showAlert('Vui lòng chọn ít nhất 1 món!');
         return;
     }
 
@@ -560,7 +560,7 @@ function confirmConcession(movieTitle) {
 
     orders.push(order);
 
-    alert(`✅ Đặt hàng thành công!\n\n📋 Mã đơn: #${order.id}\n🎬 Phim: ${movieTitle}\n🍿 Món: ${itemsList.join(', ')}\n💰 Tổng tiền: ${total.toLocaleString()} VNĐ`);
+    showAlert(`✅ Đặt hàng thành công!\n\n📋 Mã đơn: #${order.id}\n🎬 Phim: ${movieTitle}\n🍿 Món: ${itemsList.join(', ')}\n💰 Tổng tiền: ${total.toLocaleString()} VNĐ`);
     closeModal();
 }
 
@@ -592,7 +592,7 @@ function showVouchers() {
 
 function copyVoucher(code) {
     navigator.clipboard.writeText(code);
-    alert(`✅ Đã sao chép mã: ${code}`);
+    showAlert(`Đã sao chép mã: ${code}`);
 }
 
 // ========== Orders ==========
@@ -671,7 +671,7 @@ function updateOrderStatus(orderId, newStatus) {
     const order = orders.find(o => o.id === orderId);
     if (order) {
         order.status = newStatus;
-        alert(`✅ Đã cập nhật trạng thái đơn #${orderId}`);
+        showAlert(`Đã cập nhật trạng thái đơn #${orderId}`);
         showOrders();
     }
 }
@@ -679,7 +679,7 @@ function updateOrderStatus(orderId, newStatus) {
 // ========== Admin Dashboard ==========
 function showAdmin() {
     if (currentUser.role !== 'admin') {
-        alert('⚠️ Bạn không có quyền truy cập!');
+        showAlert('Bạn không có quyền truy cập!');
         return;
     }
 
@@ -767,17 +767,17 @@ function addVoucher() {
 
     if (code && desc) {
         vouchers.push({ code, discount: 0, desc });
-        alert('✅ Đã thêm voucher mới!');
+        showAlert('Đã thêm voucher mới!');
         manageVouchers();
     } else {
-        alert('⚠️ Vui lòng điền đầy đủ thông tin!');
+        showAlert('Vui lòng điền đầy đủ thông tin!');
     }
 }
 
 function deleteVoucher(index) {
     if (confirm('❓ Bạn có chắc muốn xóa voucher này?')) {
         vouchers.splice(index, 1);
-        alert('✅ Đã xóa voucher!');
+        showAlert('Đã xóa voucher!');
         manageVouchers();
     }
 }
@@ -838,7 +838,7 @@ function editConcession(index) {
         if (newPrice && !isNaN(newPrice)) {
             concessions[index].name = newName.trim();
             concessions[index].price = parseInt(newPrice);
-            alert('✅ Đã cập nhật món!');
+            showAlert('Đã cập nhật món!');
             manageConcessions();
         }
     }
@@ -847,7 +847,7 @@ function editConcession(index) {
 function deleteConcession(index) {
     if (confirm('❓ Bạn có chắc muốn xóa món này?')) {
         concessions.splice(index, 1);
-        alert('✅ Đã xóa món!');
+        showAlert('Đã xóa món!');
         manageConcessions();
     }
 }
@@ -859,12 +859,89 @@ function addConcession() {
     if (name && price && !isNaN(price)) {
         const newId = Math.max(...concessions.map(c => c.id)) + 1;
         concessions.push({ id: newId, name, price });
-        alert('✅ Đã thêm món mới!');
+        showAlert('Đã thêm món mới!');
         manageConcessions();
     } else {
-        alert('⚠️ Vui lòng điền đầy đủ thông tin hợp lệ!');
+        showAlert('Vui lòng điền đầy đủ thông tin hợp lệ!');
     }
 }
+
+let alertCallback = null;
+let alertTimer = null;
+
+function showAlert(message, type = "info", options = {}) {
+    const overlay = document.querySelector("#alertOverlay");
+    const box = overlay.querySelector(".alert-box");
+    const icon = overlay.querySelector("#alertIcon");
+    const title = overlay.querySelector("#alertTitle");
+    const msg = overlay.querySelector("#alertMessage");
+
+    if (alertTimer) clearTimeout(alertTimer);
+
+    alertCallback = options.onOk || null;
+
+    // reset class
+    box.className = "alert-box";
+
+    const icons = {
+        error: "fa-circle-xmark",
+        warning: "fa-triangle-exclamation",
+        success: "fa-circle-check",
+        info: "fa-circle-info"
+    };
+
+    const titles = {
+        error: "Lỗi",
+        warning: "Cảnh báo",
+        success: "Thành công",
+        info: "Thông báo"
+    };
+
+    icon.className = `fa-solid ${icons[type]}`;
+    title.textContent = titles[type];
+    msg.textContent = message;
+
+    if (type === "error") {
+        box.classList.add("alert-error"); // rung nhẹ
+    }
+
+    overlay.style.display = "flex";
+
+    // auto close
+    if (options.autoClose) {
+        alertTimer = setTimeout(closeAlert, options.autoClose);
+    }
+}
+
+function handleAlertOk() {
+    if (typeof alertCallback === "function") {
+        alertCallback();
+    }
+    closeAlert();
+}
+
+function closeAlert() {
+    const overlay = document.querySelector("#alertOverlay");
+    overlay.style.display = "none";
+    alertCallback = null;
+}
+
+// click ra ngoài để đóng
+function handleOverlayClick(e) {
+    if (e.target.id === "alertOverlay") {
+        closeAlert();
+    }
+}
+
+// ESC để đóng
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+        closeAlert();
+    }
+});
+
+
+
 
 // ========== Expose Functions to Window ==========
 window.login = login;
@@ -892,3 +969,6 @@ window.manageConcessions = manageConcessions;
 window.editConcession = editConcession;
 window.deleteConcession = deleteConcession;
 window.addConcession = addConcession;
+window.closeAlert = closeAlert;
+window.handleAlertOk = handleAlertOk;
+window.handleOverlayClick = handleOverlayClick;

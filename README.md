@@ -46,6 +46,7 @@ Web đặt vé xem phim, đặt bắp nước, giao diện cold color theme, có
 ```bash
 git clone https://github.com/161seconds/web-movie.git
 
+Tài khoản demo:
 Admin:
 username: admin
 password: 123
