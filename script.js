@@ -284,10 +284,10 @@ function showBooking(movieId, movieTitle) {
             <div class="form-group">
                 <label><i class="fa-solid fa-building"></i> Chọn rạp:</label>
                 <select id="cinema" onchange="reloadBookedSeats(currentMovieTitle)">
-                    <option>CGV Vincom Center</option>
-                    <option>Lotte Cinema Diamond</option>
+                    <option>BHD Star Vincom Lê Văn Việt</option>
+                    <option>Cinestar Sinh Viên</option>
+                    <option>Lotte Cinema - Cantavil</option>
                     <option>Galaxy Nguyễn Du</option>
-                    <option>BHD Star Bitexco</option>
                 </select>
             </div>
             <div class="form-group">
@@ -303,6 +303,8 @@ function showBooking(movieId, movieTitle) {
                     <option>16:30</option>
                     <option>19:00</option>
                     <option>21:30</option>
+                    <option>25:00</option>
+                    <option>36:67</option>
                 </select>
             </div>
             <div class="form-group">
@@ -326,7 +328,7 @@ function showBooking(movieId, movieTitle) {
                     </div>
                 </div>
             </div>
-            <div style="margin-top: 1.5rem; padding: 1rem; background: var(--cold-main); border-radius: 10px; font-size: 1.3rem; color: var(--cold-main); font-weight: bold; text-align: center;">
+            <div style="margin-top: 1.5rem; padding: 1rem; background: var(--cold-main); border-radius: 10px; font-size: 1.3rem; color: white; font-weight: bold; text-align: center;">
                 <i class="fa-solid fa-wallet"></i> Tổng tiền: <span id="totalPrice">0</span> VNĐ
             </div>
             <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="window.confirmBooking('${movieTitle.replace(/'/g, "\\'")}')"><i class="fa-solid fa-check"></i> Xác nhận đặt vé</button>
@@ -463,19 +465,25 @@ function showConcession(movieId, movieTitle) {
     concessionCart = {};
 
     content.innerHTML = `
-        <button class="close-btn" onclick="window.closeModal()">×</button>
-        <h2>🍿 Đặt bắp nước: ${movieTitle}</h2>
-        <div class="concession-form">
-            <div id="concessionItems"></div>
-            <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(243, 156, 18, 0.2); border-radius: 10px;">
-                <div style="font-size: 1.4rem; color: #f39c12; font-weight: bold; text-align: center; margin-bottom: 1rem;">
-                    💰 Tổng tiền: <span id="concessionTotal">0</span> VNĐ
-                </div>
-                <button class="btn btn-primary" style="width: 100%;" onclick="window.confirmConcession('${movieTitle.replace(/'/g, "\\'")}')"><i class="fa-solid fa-check"></i> Xác nhận đặt hàng</button>
-            </div>
-        </div>
-    `;
+    <button class="close-btn" onclick="window.closeModal()">×</button>
+    <h2><i class="fa-solid fa-popcorn"></i> Đặt bắp nước: ${movieTitle}</h2>
 
+    <div class="concession-form">
+        <div id="concessionItems"></div>
+
+        <div class="concession-total-box">
+            <div class="concession-total-text">
+                <i class="fa-solid fa-coins"></i>
+                Tổng tiền: <span id="concessionTotal">0</span> VNĐ
+            </div>
+
+            <button class="btn btn-primary w-full"
+                onclick="window.confirmConcession('${movieTitle.replace(/'/g, "\\'")}')">
+                <i class="fa-solid fa-check"></i> Xác nhận đặt hàng
+            </button>
+        </div>
+    </div>
+`;
     displayConcessionItems();
 }
 
@@ -485,7 +493,7 @@ function displayConcessionItems() {
         <div class="concession-item">
             <div>
                 <div style="font-weight: bold; margin-bottom: 0.5rem; font-size: 1.1rem;">${item.name}</div>
-                <div style="color: #f39c12; font-weight: bold;">${item.price.toLocaleString()} VNĐ</div>
+                <div style="color: #3393e2ff; font-weight: bold;">${item.price.toLocaleString()} VNĐ</div>
             </div>
             <div class="quantity-control">
                 <button onclick="window.updateQuantity(${item.id}, -1)">-</button>
@@ -564,19 +572,19 @@ function showVouchers() {
     modal.classList.add('active');
     content.innerHTML = `
         <button class="close-btn" onclick="window.closeModal()">×</button>
-        <h2>🎫 Voucher khuyến mãi</h2>
+        <h2><i class="fa-solid fa-ticket"></i> Voucher khuyến mãi</h2>
         <div class="voucher-list">
             ${vouchers.map(v => `
                 <div class="voucher-card">
                     <div class="voucher-code">${v.code}</div>
                     <div style="margin-bottom: 1rem;">${v.desc}</div>
-                    <button class="btn btn-primary" onclick="window.copyVoucher('${v.code}')">📋 Sao chép mã</button>
+                    <button class="btn btn-primary" onclick="window.copyVoucher('${v.code}')"><i class="fa-solid fa-copy"></i> Sao chép mã</button>
                 </div>
             `).join('')}
         </div>
         ${currentUser.role === 'admin' ? `
             <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
-                <button class="btn btn-secondary" onclick="window.manageVouchers()">⚙️ Quản lý voucher</button>
+                <button class="btn btn-secondary" onclick="window.manageVouchers()"><i class="fa-solid fa-ticket"></i> Quản lý voucher</button>
             </div>
         ` : ''}
     `;
@@ -601,7 +609,7 @@ function showOrders() {
 
     content.innerHTML = `
         <button class="close-btn" onclick="window.closeModal()">×</button>
-        <h2>📋 ${currentUser.role === 'admin' ? 'Tất cả đơn hàng' : 'Đơn hàng của tôi'}</h2>
+        <h2><i class="fa-solid fa-list"></i> ${currentUser.role === 'admin' ? 'Tất cả đơn hàng' : 'Đơn hàng của tôi'}</h2>
         <div class="admin-section">
             ${userOrders.length === 0 ? '<p style="text-align: center; padding: 2rem; color: #aaa;">Chưa có đơn hàng nào.</p>' : `
                 <div style="overflow-x: auto;">
@@ -629,7 +637,7 @@ function showOrders() {
                                     <td style="font-size: 0.9rem;">${order.type === 'Vé phim' ?
             `${order.cinema}<br>${order.date} ${order.showtime}<br>Ghế: ${order.seats}` :
             order.items}</td>
-                                    <td style="color: #f39c12; font-weight: bold;">${order.total.toLocaleString()} VNĐ</td>
+                                    <td style="color: #33a3e4ff; font-weight: bold;">${order.total.toLocaleString()} VNĐ</td>
                                     <td><span class="status-badge status-${order.status}">${getStatusText(order.status)}</span></td>
                                     <td style="font-size: 0.9rem;">${order.timestamp}</td>
                                     ${currentUser.role === 'admin' ? `
@@ -652,8 +660,8 @@ function showOrders() {
 
 function getStatusText(status) {
     const statusMap = {
-        'pending': '⏳ Chờ xử lý',
-        'completed': '✅ Hoàn thành',
+        'pending': '<i class="fa-solid fa-clock"></i> Chờ xử lý',
+        'completed': '<i class="fa-solid fa-check"></i> Hoàn thành',
         'cancelled': '<i class="fa-solid fa-x"></i> Đã hủy'
     };
     return statusMap[status] || status;
@@ -687,20 +695,20 @@ function showAdmin() {
 
     content.innerHTML = `
         <button class="close-btn" onclick="window.closeModal()">×</button>
-        <h2>👨‍💼 Admin Dashboard</h2>
+        <h2><i class="fa-solid fa-user"></i> Admin Dashboard</h2>
         <div class="admin-dashboard">
             <div class="admin-stats">
                 <div class="stat-card">
                     <div class="stat-number">${totalOrders}</div>
-                    <div class="stat-label">📊 Tổng đơn hàng</div>
+                    <div class="stat-label"><i class="fa-solid fa-shopping-cart"></i> Tổng đơn hàng</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number">${totalRevenue.toLocaleString()}</div>
-                    <div class="stat-label">💰 Doanh thu (VNĐ)</div>
+                    <div class="stat-label"><i class="fa-solid fa-money-bill-wave"></i> Doanh thu (VNĐ)</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number">${pendingOrders}</div>
-                    <div class="stat-label">⏳ Chờ xử lý</div>
+                    <div class="stat-label"><i class="fa-solid fa-clock"></i> Chờ xử lý</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number">${completedOrders}</div>
@@ -709,11 +717,11 @@ function showAdmin() {
             </div>
 
             <div class="admin-section">
-                <h2>📊 Quản lý hệ thống</h2>
+                <h2><i class="fa-solid fa-cogs"></i> Quản lý hệ thống</h2>
                 <div class="action-buttons">
-                    <button class="btn btn-primary" onclick="window.showOrders()">📋 Xem tất cả đơn hàng</button>
-                    <button class="btn btn-secondary" onclick="window.manageVouchers()">🎫 Quản lý voucher</button>
-                    <button class="btn btn-secondary" onclick="window.manageConcessions()">🍿 Quản lý bắp nước</button>
+                    <button class="btn btn-primary" onclick="window.showOrders()"><i class="fa-solid fa-list"></i> Xem tất cả đơn hàng</button>
+                    <button class="btn btn-secondary" onclick="window.manageVouchers()"><i class="fa-solid fa-ticket"></i> Quản lý voucher</button>
+                    <button class="btn btn-secondary" onclick="window.manageConcessions()"><i class="fa-solid fa-popcorn"></i> Quản lý bắp nước</button>
                 </div>
             </div>
         </div>
@@ -726,7 +734,7 @@ function manageVouchers() {
 
     content.innerHTML = `
         <button class="close-btn" onclick="window.closeModal()">×</button>
-        <h2>🎫 Quản lý Voucher</h2>
+        <h2><i class="fa-solid fa-ticket"></i> Quản lý Voucher</h2>
         <div class="admin-section">
             <div class="voucher-list">
                 ${vouchers.map((v, i) => `
@@ -789,24 +797,24 @@ function manageConcessions() {
                         <th>Tên món</th>
                         <th>Giá</th>
                         <th>Hành động</th>
-                    </tr>
+                    </tr>  
                 </thead>
                 <tbody>
                     ${concessions.map((item, i) => `
                         <tr>
                             <td>${item.id}</td>
                             <td>${item.name}</td>
-                            <td style="color: #f39c12; font-weight: bold;">${item.price.toLocaleString()} VNĐ</td>
+                            <td class="price-cold">${item.price.toLocaleString()} VNĐ</td>
                             <td>
-                                <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem; margin-right: 0.5rem;" onclick="window.editConcession(${i})">✏️ Sửa</button>
-                                <button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="window.deleteConcession(${i})">❌ Xóa</button>
+                                <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem; margin-right: 0.5rem;" onclick="window.editConcession(${i})"><i class="fa-solid fa-pen"></i> Sửa</button>
+                                <button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="window.deleteConcession(${i})"><i class="fa-solid fa-trash"></i> Xóa</button>
                             </td>
                         </tr>
                     `).join('')}
                 </tbody>
             </table>
             
-            <div style="margin-top: 2rem; padding: 2rem; background: rgba(233, 69, 96, 0.1); border-radius: 10px;">
+            <div style="margin-top: 2rem; padding: 2rem; background: rgba(11, 146, 224, 0.1); border-radius: 10px;">
                 <h3><i class="fa-solid fa-plus"></i> Thêm món mới</h3>
                 <div class="form-group">
                     <label>Tên món:</label>
