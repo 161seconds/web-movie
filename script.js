@@ -85,15 +85,38 @@ function login() {
 }
 
 function logout() {
-    if (confirm('Bạn có chắc muốn đăng xuất?')) {
-        currentUser = null;
-        document.getElementById('loginScreen').style.display = 'flex';
-        document.getElementById('mainApp').style.display = 'none';
-        document.getElementById('loginUsername').value = '';
-        document.getElementById('loginPassword').value = '';
-        document.getElementById('searchInput').value = '';
-    }
+    currentUser = null;
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('loginUsername').value = '';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('searchInput').value = '';
+
 }
+
+logoutBtn.addEventListener('click', () => {
+    showAlert('Bạn có chắc chắn muốn đăng xuất?',
+        'warning',
+        {
+            onOk: () => logout()
+        }
+    );
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    checkLogin();
+
+    const buttonLogin = document.querySelector('.btn.btn-primary');
+
+    if (buttonLogin) {
+        buttonLogin.addEventListener('click', login);
+    }
+
+    const logoutBtn = document.querySelector('#logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', showLogoutPopup);
+    }
+});
 
 function checkLogin() {
     if (!currentUser) {
