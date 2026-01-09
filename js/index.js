@@ -48,51 +48,189 @@ let concessionCart = {};
 let orders = [];
 let orderId = 1;
 let currentMovieTitle = '';
+
+// Thêm vào phần accounts để lưu user đăng ký
+let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || {};
+
+// Merge với accounts mặc định
+const allAccounts = { ...accounts, ...registeredUsers };
 // ========== Initialize ==========
 document.addEventListener('DOMContentLoaded', () => {
     checkLogin();
-    const buttonLogin = document.querySelector('.btn.btn-primary');
-    buttonLogin.addEventListener('click', login);
+
+    const loginBtn = document.querySelector('#loginBtn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', login);
+    }
+
+    const logoutBtn = document.querySelector('#logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            showAlert(
+                'Bạn có chắc muốn đăng xuất?',
+                'warning',
+                { onOk: logout }
+            );
+        });
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const loginRedirect = document.querySelector('#loginRedirect');
+
+    if (loginRedirect) {
+        loginRedirect.addEventListener('click', () => {
+            window.location.href = 'login.html';
+        });
+    }
 });
 
 
 
+
 // ========== Authentication ==========
+function handleBookingClick(movieId, movieTitle) {
+    if (!isLoggedIn()) {
+        localStorage.setItem(
+            'pendingBooking',
+            JSON.stringify({ movieId, movieTitle })
+        );
+
+        showAlert(
+            "Cần đăng nhập",
+            "warning",
+            {
+                onOk: () => showLogin()
+            }
+        );
+        return;
+    }
+
+    showBooking(movieId, movieTitle);
+}
+
+function isLoggedIn() {
+    return currentUser !== null;
+}
+
+function register() {
+    const username = document.getElementById('registerUsername').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const confirm = document.getElementById('registerConfirm').value;
+
+    if (!username || !password || !confirm) {
+        showAlert('Vui lòng điền đầy đủ thông tin!', 'warning');
+        return;
+    }
+
+    if (username.length < 3) {
+        showAlert('Tên người dùng phải có ít nhất 3 ký tự!', 'warning');
+        return;
+    }
+
+    if (password.length < 3) {
+        showAlert('Mật khẩu phải có ít nhất 3 ký tự!', 'warning');
+        return;
+    }
+
+    if (password !== confirm) {
+        showAlert('Mật khẩu xác nhận không khớp!', 'error');
+        return;
+    }
+
+    // Kiểm tra username đã tồn tại
+    if (accounts[username] || registeredUsers[username]) {
+        showAlert('Tên đăng nhập đã tồn tại!', 'error');
+        return;
+    }
+
+    // Lưu user mới
+    const newUser = {
+        username: username,
+        password: password,
+        role: 'user',
+        name: username
+    };
+
+    registeredUsers[username] = newUser;
+    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+
+    showAlert('Đăng ký thành công! Vui lòng đăng nhập.', 'success', {
+        onOk: () => showLogin()
+    });
+
+    // Reset form
+    document.getElementById('registerUsername').value = '';
+    document.getElementById('registerPassword').value = '';
+    document.getElementById('registerConfirm').value = '';
+}
+
 function login() {
     const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value;
 
-    if (typeof accounts === 'undefined') {
-        console.error("Dữ liệu tài khoản chưa được tải!");
-        return;
-    }
-
     if (!username || !password) {
-        showAlert('Vui lòng nhập đầy đủ thông tin!');
+        showAlert('Vui lòng nhập đầy đủ thông tin!', 'warning');
         return;
     }
 
-    const account = accounts[username];
+    // Merge accounts mặc định và registered users
+    const allAccounts = { ...accounts, ...registeredUsers };
+    const account = allAccounts[username];
 
-    if (account && account.password === password) {
-        currentUser = account;
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'block';
-        initApp();
-    } else {
-        showAlert('Tên đăng nhập hoặc mật khẩu không đúng!');
+    if (!account || account.password !== password) {
+        showAlert('Sai tên đăng nhập hoặc mật khẩu!', 'error');
+        return;
+    }
+
+    currentUser = account;
+    localStorage.setItem('currentUser', JSON.stringify(account));
+
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('registerScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+
+    showAlert('Đăng nhập thành công!', 'success');
+    
+    updateNavButtons();
+    
+    // Kiểm tra pending booking
+    const pending = localStorage.getItem('pendingBooking');
+    if (pending) {
+        const { movieId } = JSON.parse(pending);
+        localStorage.removeItem('pendingBooking');
+        setTimeout(() => showMovieDetail(movieId), 500);
     }
 }
+
+
+function showLogin() {
+    document.querySelector('#loginScreen').style.display = 'flex';
+    document.querySelector('#registerScreen').style.display = 'none';
+}
+
+function showRegister() {
+    document.querySelector('#loginScreen').style.display = 'none';
+    document.querySelector('#registerScreen').style.display = 'flex';
+}
+
+function closeAuthModal() {
+    document.querySelector('#loginScreen').style.display = 'none';
+    document.querySelector('#registerScreen').style.display = 'none';
+}
+
 
 function logout() {
+    localStorage.removeItem('currentUser');
     currentUser = null;
-    document.getElementById('loginScreen').style.display = 'flex';
-    document.getElementById('mainApp').style.display = 'none';
+
     document.getElementById('loginUsername').value = '';
     document.getElementById('loginPassword').value = '';
-    document.getElementById('searchInput').value = '';
-
+    
+    updateNavButtons();
+    showAlert('Đã đăng xuất thành công!', 'success');
 }
+
 
 logoutBtn.addEventListener('click', () => {
     showAlert('Bạn có chắc chắn muốn đăng xuất?',
@@ -103,27 +241,24 @@ logoutBtn.addEventListener('click', () => {
     );
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    checkLogin();
-
-    const buttonLogin = document.querySelector('.btn.btn-primary');
-
-    if (buttonLogin) {
-        buttonLogin.addEventListener('click', login);
-    }
-
-    const logoutBtn = document.querySelector('#logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', showLogoutPopup);
-    }
-});
-
 function checkLogin() {
-    if (!currentUser) {
-        document.getElementById('loginScreen').style.display = 'flex';
-        document.getElementById('mainApp').style.display = 'none';
+    const savedUser = localStorage.getItem('currentUser');
+    
+    // Load registered users
+    registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || {};
+
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+    } else {
+        currentUser = null;
     }
+    
+    updateNavButtons();
+    initGenres();
+    loadMovies();
 }
+
+
 
 // ========== Initialize App ==========
 function initApp() {
@@ -253,6 +388,12 @@ async function showMovieDetail(movieId) {
         const videos = await videosRes.json();
         const trailer = videos.results.find(v => v.type === 'Trailer') || videos.results[0];
 
+        const canBook = isLoggedIn();
+        const bookingDisabled = !canBook ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : '';
+        const bookingOnClick = canBook 
+            ? `onclick="window.showBooking(${movieId}, '${movie.title.replace(/'/g, "\\'")}')"`
+            : `onclick="window.promptLogin(${movieId}, '${movie.title.replace(/'/g, "\\'")}')"`;
+
         content.innerHTML = `
             <button class="close-btn" onclick="window.closeModal()">×</button>
             <div class="movie-detail-header">
@@ -267,8 +408,15 @@ async function showMovieDetail(movieId) {
                     <p><strong>Mô tả:</strong></p>
                     <p style="text-align: justify;">${movie.overview || 'Chưa có mô tả'}</p>
                     <div class="action-buttons">
-                        <button class="btn btn-primary" onclick="window.showBooking(${movieId}, '${movie.title.replace(/'/g, "\\'")}')"><i class="fa-solid fa-ticket"></i> Đặt vé</button>
-                        <button class="btn btn-secondary" onclick="window.showConcession(${movieId}, '${movie.title.replace(/'/g, "\\'")}')"> Đặt bắp nước</button>
+                        <button class="btn btn-primary" ${bookingDisabled} ${bookingOnClick}>
+                            <i class="fa-solid fa-ticket"></i> Đặt vé
+                            ${!canBook ? ' (Cần đăng nhập)' : ''}
+                        </button>
+                        <button class="btn btn-secondary" ${bookingDisabled} 
+                            ${canBook ? `onclick="window.showConcession(${movieId}, '${movie.title.replace(/'/g, "\\'")}')"` : `onclick="window.promptLogin(${movieId}, '${movie.title.replace(/'/g, "\\'")}')"` }>
+                            <i class="fa-solid fa-popcorn"></i> Đặt bắp nước
+                            ${!canBook ? ' (Cần đăng nhập)' : ''}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -284,6 +432,16 @@ async function showMovieDetail(movieId) {
     }
 }
 
+function promptLogin(movieId, movieTitle) {
+    localStorage.setItem('pendingBooking', JSON.stringify({ movieId, movieTitle }));
+    closeModal();
+    showAlert(
+        'Vui lòng đăng nhập để đặt vé phim!',
+        'warning',
+        { onOk: () => showLogin() }
+    );
+}
+
 function closeModal() {
     document.getElementById('movieModal').classList.remove('active');
 }
@@ -292,6 +450,48 @@ function showHome() {
     document.getElementById('searchInput').value = '';
     loadMovies(currentGenre);
 }
+
+// Cập nhật các nút navigation dựa trên trạng thái đăng nhập
+function updateNavButtons() {
+    const navLinks = document.getElementById('navLinks');
+    
+    if (isLoggedIn()) {
+        navLinks.innerHTML = `
+            <button onclick="window.showHome()">Trang chủ</button>
+            <button onclick="window.showVouchers()">Khuyến mãi</button>
+            <button onclick="window.showOrders()">Đơn hàng</button>
+            ${currentUser.role === 'admin' ? '<button onclick="window.showAdmin()">Quản lý</button>' : ''}
+            <div style="display: flex; align-items: center; gap: 1rem; margin-left: 1rem; padding-left: 1rem; border-left: 2px solid var(--cold-border)">
+                <span style="color: var(--cold-border); font-weight: bold;">
+                    <i class="fa-solid fa-user"></i> ${currentUser.name}
+                </span>
+                <button onclick="handleLogout()" style="background: var(--cold-main);">
+                    <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                </button>
+            </div>
+        `;
+    } else {
+        navLinks.innerHTML = `
+            <button onclick="window.showHome()">Trang chủ</button>
+            <button onclick="window.showVouchers()">Khuyến mãi</button>
+            <button onclick="window.showLogin()">
+                <i class="fa-solid fa-right-to-bracket"></i> Đăng nhập
+            </button>
+            <button onclick="window.showRegister()" style="background: var(--cold-main);">
+                <i class="fa-solid fa-user-plus"></i> Đăng ký
+            </button>
+        `;
+    }
+}
+
+function handleLogout() {
+    showAlert(
+        'Bạn có chắc chắn muốn đăng xuất?',
+        'warning',
+        { onOk: () => logout() }
+    );
+}
+
 
 // ========== Booking ==========
 function showBooking(movieId, movieTitle) {
@@ -359,6 +559,15 @@ function showBooking(movieId, movieTitle) {
     `;
 
     generateSeats();
+}
+
+function bookTicket(movieId, movieTitle) {
+    if (!isLoggedIn()) {
+        localStorage.setItem('pendingBooking', JSON.stringify({ movieId, movieTitle }));
+        showAlert("warning", "Cần đăng nhập", "Vui lòng đăng nhập để đặt vé!", () => showLogin(true));
+        return;
+    }
+    openSeatSelectionModal(movieId, movieTitle);
 }
 
 function generateSeats() {
@@ -995,3 +1204,8 @@ window.addConcession = addConcession;
 window.closeAlert = closeAlert;
 window.handleAlertOk = handleAlertOk;
 window.handleOverlayClick = handleOverlayClick;
+window.register = register;
+window.showRegister = showRegister;
+window.closeAuthModal = closeAuthModal;
+window.isLoggedIn = isLoggedIn;
+window.promptLogin = promptLogin;

@@ -2,6 +2,9 @@
 .env
 .env.*
 
+#api keys
+.api_keys.json 
+
 # dependencies
 node_modules/
 

@@ -1,36 +1,22 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>B-FlixMovie</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
-    <!-- Login Screen -->
-    <div id="loginScreen" class="login-screen">
-        <div class="login-container">
-            <h1 class="logo">B-FlixMovie</h1>
-            <h2>Đăng nhập</h2>
-            <div class="login-form">
-                <div class="form-group">
-                    <label>Tên đăng nhập:</label>
-                    <input type="text" id="loginUsername" placeholder="Nhập tên đăng nhập">
-                </div>
-                <div class="form-group">
-                    <label>Mật khẩu:</label>
-                    <input type="password" id="loginPassword" placeholder="Nhập mật khẩu"
-                        onkeypress="if(event.key==='Enter') window.login()">
-                </div>
-                <button class="btn btn-primary" style="width: 100%;">Đăng nhập</button>
-            </div>
-        </div>
-    </div>
+    <button class="btn btn-secondary" id="loginRedirect">
+        Đăng nhập
+    </button>
+
 
     <!-- Main App -->
-    <div id="mainApp" style="display: none;">
+    <div id="mainApp" style="display: block;">
         <header class="header">
             <nav class="nav">
                 <div class="logo" onclick="window.showHome()">B-FlixMovie</div>
@@ -39,23 +25,15 @@
                         onkeypress="if(event.key==='Enter') window.searchMovies()">
                     <i onclick="window.searchMovies()" class="btnSearch fa-solid fa-magnifying-glass"></i>
                 </div>
-                <div class="nav-links">
-                    <button onclick="window.showHome()">Trang chủ</button>
-                    <button onclick="window.showVouchers()">Khuyến mãi</button>
-                    <button id="ordersBtn" onclick="window.showOrders()">Đơn hàng</button>
-                    <button id="adminBtn" onclick="window.showAdmin()" style="display: none;">Quản lý</button>
-                    <div
-                        style="display: flex; align-items: center; gap: 1rem; margin-left: 1rem; padding-left: 1rem; border-left: 2px solid var(--cold-border)">
-                        <span id="userDisplay" style="color: var(--cold-border); font-weight: bold;"></span>
-                        <button id="logoutBtn" style="background: var(--cold-main);">Đăng xuất</button>
-                    </div>
+                <div class="nav-links" id="navLinks">
+                    <button class="btn btn-secondary" id="logoutBtn">
+                        <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                    </button>
                 </div>
             </nav>
         </header>
 
         <div class="search-container">
-
-
             <div class="genre-filter" id="genreFilter"></div>
         </div>
 
@@ -69,20 +47,20 @@
     </div>
 
     <!-- Custom Alert Modal -->
-    <div id="alertOverlay" onclick="handleOverlayClick(event)">
+    <div id="alertOverlay">
         <div class="alert-box">
-            <button class="alert-close" onclick="closeAlert()">×</button>
+            <button class="alert-close" id="alertClose">×</button>
 
             <i id="alertIcon" class="fa-solid fa-circle-info"></i>
             <h3 id="alertTitle">Thông báo</h3>
             <p id="alertMessage"></p>
 
-            <button class="btn btn-primary" onclick="handleAlertOk()">OK</button>
+            <button class="btn btn-primary" id="alertOk">OK</button>
         </div>
     </div>
 
 
-    <script type="module" src="script.js"></script>
+    <script type="module" src="/js/script.js"></script>
 </body>
 
 </html>
