@@ -50,29 +50,63 @@ let orderId = 1;
 let currentMovieTitle = '';
 
 // Thêm vào phần accounts để lưu user đăng ký
-let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || {};
+// let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || {};
 
 // Merge với accounts mặc định
-const allAccounts = { ...accounts, ...registeredUsers };
+// const allAccounts = { ...accounts, ...registeredUsers };
 // ========== Initialize ==========
-document.addEventListener('DOMContentLoaded', () => {
-    checkLogin();
+// document.addEventListener('DOMContentLoaded', () => {
+//     checkLogin();
 
-    const loginBtn = document.querySelector('#loginBtn');
-    if (loginBtn) {
-        loginBtn.addEventListener('click', login);
+//     const loginBtn = document.querySelector('#loginBtn');
+//     if (loginBtn) {
+//         loginBtn.addEventListener('click', login);
+//     }
+
+//     const logoutBtn = document.querySelector('#logoutBtn');
+//     if (logoutBtn) {
+//         logoutBtn.addEventListener('click', () => {
+//             showAlert(
+//                 'Bạn có chắc muốn đăng xuất?',
+//                 'warning',
+//                 { onOk: logout }
+//             );
+//         });
+//     }
+// });
+
+document.addEventListener('DOMContentLoaded', () => {
+    checkLoginStatus();
+    initGenres();
+    loadMovies();
+
+    // Event listeners cho alert
+    const alertOk = document.getElementById('alertOk');
+    const alertClose = document.getElementById('alertClose');
+    const alertOverlay = document.getElementById('alertOverlay');
+
+    if (alertOk) {
+        alertOk.addEventListener('click', handleAlertOk);
     }
 
-    const logoutBtn = document.querySelector('#logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            showAlert(
-                'Bạn có chắc muốn đăng xuất?',
-                'warning',
-                { onOk: logout }
-            );
+    if (alertClose) {
+        alertClose.addEventListener('click', closeAlert);
+    }
+
+    if (alertOverlay) {
+        alertOverlay.addEventListener('click', (e) => {
+            if (e.target.id === 'alertOverlay') {
+                closeAlert();
+            }
         });
     }
+
+    // ESC để đóng alert
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeAlert();
+        }
+    });
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -84,9 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-
-
-
 
 // ========== Authentication ==========
 function handleBookingClick(movieId, movieTitle) {
@@ -108,10 +139,10 @@ function handleBookingClick(movieId, movieTitle) {
 
     showBooking(movieId, movieTitle);
 }
-
 function isLoggedIn() {
     return currentUser !== null;
 }
+
 
 function register() {
     const username = document.getElementById('registerUsername').value.trim();
@@ -191,9 +222,9 @@ function login() {
     document.getElementById('mainApp').style.display = 'block';
 
     showAlert('Đăng nhập thành công!', 'success');
-    
+
     updateNavButtons();
-    
+
     // Kiểm tra pending booking
     const pending = localStorage.getItem('pendingBooking');
     if (pending) {
@@ -201,6 +232,18 @@ function login() {
         localStorage.removeItem('pendingBooking');
         setTimeout(() => showMovieDetail(movieId), 500);
     }
+}
+
+function checkLoginStatus() {
+    const savedUser = localStorage.getItem('currentUser');
+
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+    } else {
+        currentUser = null;
+    }
+
+    updateNavButtons();
 }
 
 
@@ -226,24 +269,15 @@ function logout() {
 
     document.getElementById('loginUsername').value = '';
     document.getElementById('loginPassword').value = '';
-    
+
     updateNavButtons();
     showAlert('Đã đăng xuất thành công!', 'success');
 }
 
 
-logoutBtn.addEventListener('click', () => {
-    showAlert('Bạn có chắc chắn muốn đăng xuất?',
-        'warning',
-        {
-            onOk: () => logout()
-        }
-    );
-});
-
 function checkLogin() {
     const savedUser = localStorage.getItem('currentUser');
-    
+
     // Load registered users
     registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || {};
 
@@ -252,7 +286,7 @@ function checkLogin() {
     } else {
         currentUser = null;
     }
-    
+
     updateNavButtons();
     initGenres();
     loadMovies();
@@ -305,7 +339,7 @@ async function loadMovies(genreId = null) {
     moviesGrid.innerHTML = `
     <div class="loading">
         <i class="fa-solid fa-hourglass fa-spin"></i>
-        <p class="loading-text">Đang tải phim...</p>
+        <p class="loading-text">Đang tải phim</p>
     </div>
 `;
     try {
@@ -360,7 +394,7 @@ async function searchMovies() {
     }
 
     const moviesGrid = document.getElementById('moviesGrid');
-    moviesGrid.innerHTML = '<div class="loading"><i class="fa-solid fa-magnifying-glass"></i> Đang tìm kiếm...</div>';
+    moviesGrid.innerHTML = '<div class="loading"><i class="fa-solid fa-magnifying-glass"></i> Đang tìm kiếm</div>';
 
     try {
         const res = await fetch(`${API_BASE}/search/movie?api_key=${API_KEY}&language=vi-VN&query=${encodeURIComponent(query)}`);
@@ -376,7 +410,7 @@ async function showMovieDetail(movieId) {
     const content = document.getElementById('modalContent');
 
     modal.classList.add('active');
-    content.innerHTML = '<div class="loading"><i class="fa-solid fa-hourglass"></i> Đang tải thông tin...</div>';
+    content.innerHTML = '<div class="loading"><i class="fa-solid fa-hourglass"></i> Đang tải thông tin</div>';
 
     try {
         const [movieRes, videosRes] = await Promise.all([
@@ -389,31 +423,26 @@ async function showMovieDetail(movieId) {
         const trailer = videos.results.find(v => v.type === 'Trailer') || videos.results[0];
 
         const canBook = isLoggedIn();
-        const bookingDisabled = !canBook ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : '';
-        const bookingOnClick = canBook 
-            ? `onclick="window.showBooking(${movieId}, '${movie.title.replace(/'/g, "\\'")}')"`
-            : `onclick="window.promptLogin(${movieId}, '${movie.title.replace(/'/g, "\\'")}')"`;
 
         content.innerHTML = `
-            <button class="close-btn" onclick="window.closeModal()">×</button>
+            <button class="close-btn">×</button>
             <div class="movie-detail-header">
                 <img src="${movie.poster_path ? IMG_BASE + movie.poster_path : 'https://via.placeholder.com/300x450'}" 
                      alt="${movie.title}" class="movie-detail-poster">
                 <div class="movie-detail-info">
                     <h2>${movie.title}</h2>
-                    <p><strong><i class="fa-solid fa-star"></i> Đánh giá:</strong> ${movie.vote_average.toFixed(1)}/10 (${movie.vote_count.toLocaleString()} votes)</p>
+                    <p><strong><i class="fa-solid fa-star"></i> Đánh giá:</strong> ${movie.vote_average.toFixed(1)}/10</p>
                     <p><strong><i class="fa-solid fa-calendar"></i> Ngày phát hành:</strong> ${movie.release_date}</p>
                     <p><strong><i class="fa-solid fa-stopwatch"></i> Thời lượng:</strong> ${movie.runtime} phút</p>
                     <p><strong><i class="fa-solid fa-masks-theater"></i> Thể loại:</strong> ${movie.genres.map(g => g.name).join(', ')}</p>
                     <p><strong>Mô tả:</strong></p>
                     <p style="text-align: justify;">${movie.overview || 'Chưa có mô tả'}</p>
                     <div class="action-buttons">
-                        <button class="btn btn-primary" ${bookingDisabled} ${bookingOnClick}>
+                        <button class="btn btn-primary" id="bookingBtn" ${!canBook ? 'disabled' : ''}>
                             <i class="fa-solid fa-ticket"></i> Đặt vé
                             ${!canBook ? ' (Cần đăng nhập)' : ''}
                         </button>
-                        <button class="btn btn-secondary" ${bookingDisabled} 
-                            ${canBook ? `onclick="window.showConcession(${movieId}, '${movie.title.replace(/'/g, "\\'")}')"` : `onclick="window.promptLogin(${movieId}, '${movie.title.replace(/'/g, "\\'")}')"` }>
+                        <button class="btn btn-secondary" id="concessionBtn" ${!canBook ? 'disabled' : ''}>
                             <i class="fa-solid fa-popcorn"></i> Đặt bắp nước
                             ${!canBook ? ' (Cần đăng nhập)' : ''}
                         </button>
@@ -425,8 +454,38 @@ async function showMovieDetail(movieId) {
                     <h3><i class="fa-solid fa-clapperboard"></i> Trailer</h3>
                     <iframe src="https://www.youtube.com/embed/${trailer.key}" allowfullscreen></iframe>
                 </div>
-            ` : '<p style="color: #aaa; margin-top: 2rem;">Không có trailer</p>'}
+            ` : ''}
         `;
+
+        // Add event listeners
+        const closeBtn = content.querySelector('.close-btn');
+        const bookingBtn = content.querySelector('#bookingBtn');
+        const concessionBtn = content.querySelector('#concessionBtn');
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeModal);
+        }
+
+        if (bookingBtn) {
+            bookingBtn.addEventListener('click', () => {
+                if (canBook) {
+                    showBooking(movieId, movie.title);
+                } else {
+                    promptLogin(movieId, movie.title);
+                }
+            });
+        }
+
+        if (concessionBtn) {
+            concessionBtn.addEventListener('click', () => {
+                if (canBook) {
+                    showConcession(movieId, movie.title);
+                } else {
+                    promptLogin(movieId, movie.title);
+                }
+            });
+        }
+
     } catch (err) {
         content.innerHTML = '<div class="loading"><i class="fa-solid fa-x"></i> Không thể tải thông tin phim.</div>';
     }
@@ -438,7 +497,11 @@ function promptLogin(movieId, movieTitle) {
     showAlert(
         'Vui lòng đăng nhập để đặt vé phim!',
         'warning',
-        { onOk: () => showLogin() }
+        {
+            onOk: () => {
+                window.location.href = 'login.html';
+            }
+        }
     );
 }
 
@@ -454,33 +517,90 @@ function showHome() {
 // Cập nhật các nút navigation dựa trên trạng thái đăng nhập
 function updateNavButtons() {
     const navLinks = document.getElementById('navLinks');
-    
-    if (isLoggedIn()) {
+
+    if (!navLinks) return;
+
+    if (currentUser) {
+        // Đã đăng nhập
         navLinks.innerHTML = `
-            <button onclick="window.showHome()">Trang chủ</button>
-            <button onclick="window.showVouchers()">Khuyến mãi</button>
-            <button onclick="window.showOrders()">Đơn hàng</button>
-            ${currentUser.role === 'admin' ? '<button onclick="window.showAdmin()">Quản lý</button>' : ''}
+            <button class="btn">
+                <i class="fa-solid fa-home"></i> Trang chủ
+            </button>
+            <button class="btn">
+                <i class="fa-solid fa-ticket"></i> Khuyến mãi
+            </button>
+            <button class="btn">
+                <i class="fa-solid fa-shopping-cart"></i> Đơn hàng
+            </button>
+            ${currentUser.role === 'admin' ? `
+                <button class="btn">
+                    <i class="fa-solid fa-cog"></i> Quản lý
+                </button>
+            ` : ''}
             <div style="display: flex; align-items: center; gap: 1rem; margin-left: 1rem; padding-left: 1rem; border-left: 2px solid var(--cold-border)">
                 <span style="color: var(--cold-border); font-weight: bold;">
                     <i class="fa-solid fa-user"></i> ${currentUser.name}
                 </span>
-                <button onclick="handleLogout()" style="background: var(--cold-main);">
+                <button class="btn btn-secondary" id="logoutBtn">
                     <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
                 </button>
             </div>
         `;
+
+        // Add event cho nút đăng xuất
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', handleLogout);
+        }
+
+        // Add events cho các nút khác
+        const buttons = navLinks.querySelectorAll('button');
+        buttons.forEach((btn, index) => {
+            if (index === 0) btn.addEventListener('click', () => window.showHome());
+            if (index === 1) btn.addEventListener('click', () => window.showVouchers());
+            if (index === 2) btn.addEventListener('click', () => window.showOrders());
+            if (currentUser.role === 'admin' && index === 3) {
+                btn.addEventListener('click', () => window.showAdmin());
+            }
+        });
+
     } else {
+        // Chưa đăng nhập
         navLinks.innerHTML = `
-            <button onclick="window.showHome()">Trang chủ</button>
-            <button onclick="window.showVouchers()">Khuyến mãi</button>
-            <button onclick="window.showLogin()">
+            <button class="btn">
+                <i class="fa-solid fa-home"></i> Trang chủ
+            </button>
+            <button class="btn">
+                <i class="fa-solid fa-ticket"></i> Khuyến mãi
+            </button>
+            <button class="btn btn-primary" id="loginRedirect">
                 <i class="fa-solid fa-right-to-bracket"></i> Đăng nhập
             </button>
-            <button onclick="window.showRegister()" style="background: var(--cold-main);">
+            <button class="btn btn-secondary" id="registerRedirect">
                 <i class="fa-solid fa-user-plus"></i> Đăng ký
             </button>
         `;
+
+        // Add events
+        const homeBtn = navLinks.querySelector('button:nth-child(1)');
+        const voucherBtn = navLinks.querySelector('button:nth-child(2)');
+        const loginBtn = document.getElementById('loginRedirect');
+        const registerBtn = document.getElementById('registerRedirect');
+
+        if (homeBtn) homeBtn.addEventListener('click', () => window.showHome());
+        if (voucherBtn) voucherBtn.addEventListener('click', () => window.showVouchers());
+
+        if (loginBtn) {
+            loginBtn.addEventListener('click', () => {
+                window.location.href = 'login.html';
+            });
+        }
+
+        if (registerBtn) {
+            registerBtn.addEventListener('click', () => {
+                window.location.href = 'register.html';
+            });
+        }
     }
 }
 
@@ -488,9 +608,17 @@ function handleLogout() {
     showAlert(
         'Bạn có chắc chắn muốn đăng xuất?',
         'warning',
-        { onOk: () => logout() }
+        {
+            onOk: () => {
+                localStorage.removeItem('currentUser');
+                currentUser = null;
+                updateNavButtons();
+                showAlert('Đã đăng xuất thành công!', 'success');
+            }
+        }
     );
 }
+
 
 
 // ========== Booking ==========
