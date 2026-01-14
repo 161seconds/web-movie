@@ -29,9 +29,28 @@ const concessions = [
 ];
 
 const vouchers = [
-    { code: 'MOVIE50K', discount: 50000, desc: 'Giảm 50k cho đơn từ 200k' },
-    { code: 'FREEPOP', discount: 0, desc: 'Tặng bắp nước combo 1' },
-    { code: 'WEEK30', discount: '30%', desc: 'Giảm 30% vào các ngày trong tuần' }
+    {
+        code: 'MOVIE50K',
+        type: 'fixed',          
+        value: 50000,
+        minOrder: 200000,
+        applyTo: 'all',
+        desc: 'Giảm 50k cho đơn từ 200k'
+    },
+    {
+        code: 'FREEPOP',
+        type: 'gift',
+        gift: 'combo1',        
+        applyTo: 'food',
+        desc: 'Tặng bắp nước combo 1'
+    },
+    {
+        code: 'WEEK30',
+        type: 'percent',
+        value: 30,
+        applyTo: 'all',
+        desc: 'Giảm 30% vào các ngày trong tuần'
+    }
 ];
 
 // User accounts (trong thực tế sẽ lưu trong database)
@@ -48,76 +67,51 @@ let concessionCart = {};
 let orders = [];
 let orderId = 1;
 let currentMovieTitle = '';
-
-// Thêm vào phần accounts để lưu user đăng ký
-// let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || {};
-
-// Merge với accounts mặc định
-// const allAccounts = { ...accounts, ...registeredUsers };
-// ========== Initialize ==========
-// document.addEventListener('DOMContentLoaded', () => {
-//     checkLogin();
-
-//     const loginBtn = document.querySelector('#loginBtn');
-//     if (loginBtn) {
-//         loginBtn.addEventListener('click', login);
-//     }
-
-//     const logoutBtn = document.querySelector('#logoutBtn');
-//     if (logoutBtn) {
-//         logoutBtn.addEventListener('click', () => {
-//             showAlert(
-//                 'Bạn có chắc muốn đăng xuất?',
-//                 'warning',
-//                 { onOk: logout }
-//             );
-//         });
-//     }
-// });
+let baseTotal = 0;
+let finalTotal = 0;
+let appliedVoucher = null;
 
 document.addEventListener('DOMContentLoaded', () => {
+    // ===== INIT APP =====
     checkLoginStatus();
     initGenres();
     loadMovies();
 
-    // Event listeners cho alert
-    const alertOk = document.getElementById('alertOk');
-    const alertClose = document.getElementById('alertClose');
-    const alertOverlay = document.getElementById('alertOverlay');
+    // ===== ALERT EVENTS =====
+    const alertOk = document.querySelector('#alertOk');
+    const alertClose = document.querySelector('#alertClose');
+    const alertOverlay = document.querySelector('#alertOverlay');
 
-    if (alertOk) {
-        alertOk.addEventListener('click', handleAlertOk);
-    }
+    alertOk?.addEventListener('click', handleAlertOk);
+    alertClose?.addEventListener('click', closeAlert);
 
-    if (alertClose) {
-        alertClose.addEventListener('click', closeAlert);
-    }
+    alertOverlay?.addEventListener('click', (e) => {
+        if (e.target.id === 'alertOverlay') {
+            closeAlert();
+        }
+    });
 
-    if (alertOverlay) {
-        alertOverlay.addEventListener('click', (e) => {
-            if (e.target.id === 'alertOverlay') {
-                closeAlert();
-            }
-        });
-    }
-
-    // ESC để đóng alert
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             closeAlert();
         }
     });
-});
 
-document.addEventListener('DOMContentLoaded', () => {
+    // ===== LOGIN REDIRECT =====
     const loginRedirect = document.querySelector('#loginRedirect');
-
-    if (loginRedirect) {
-        loginRedirect.addEventListener('click', () => {
-            window.location.href = 'login.html';
-        });
-    }
+    loginRedirect?.addEventListener('click', () => {
+        window.location.href = 'login.html';
+    });
 });
+
+document.querySelector('#applyVoucherBtn')
+    ?.addEventListener('click', () => {
+        const baseTotal = selectedSeats.length * 75000;
+        const finalTotal = applyVoucher(baseTotal);
+
+        document.querySelector('#totalPrice').textContent =
+            finalTotal.toLocaleString();
+    });
 
 // ========== Authentication ==========
 function handleBookingClick(movieId, movieTitle) {
@@ -142,7 +136,6 @@ function handleBookingClick(movieId, movieTitle) {
 function isLoggedIn() {
     return currentUser !== null;
 }
-
 
 function register() {
     const username = document.getElementById('registerUsername').value.trim();
@@ -291,8 +284,6 @@ function checkLogin() {
     initGenres();
     loadMovies();
 }
-
-
 
 // ========== Initialize App ==========
 function initApp() {
@@ -619,8 +610,6 @@ function handleLogout() {
     );
 }
 
-
-
 // ========== Booking ==========
 function showBooking(movieId, movieTitle) {
     currentMovieTitle = movieTitle;
@@ -630,8 +619,12 @@ function showBooking(movieId, movieTitle) {
 
     content.innerHTML = `
         <button class="close-btn" onclick="window.closeModal()">×</button>
+
         <h2><i class="fa-solid fa-ticket"></i> Đặt vé: ${movieTitle}</h2>
+
         <div class="booking-form">
+
+            <!-- chọn rạp -->
             <div class="form-group">
                 <label><i class="fa-solid fa-building"></i> Chọn rạp:</label>
                 <select id="cinema" onchange="reloadBookedSeats(currentMovieTitle)">
@@ -641,10 +634,16 @@ function showBooking(movieId, movieTitle) {
                     <option>Galaxy Nguyễn Du</option>
                 </select>
             </div>
+
+            <!-- ngày -->
             <div class="form-group">
                 <label><i class="fa-solid fa-calendar"></i> Chọn ngày:</label>
-                <input type="date" id="date" min="${new Date().toISOString().split('T')[0]}"onchange="reloadBookedSeats(currentMovieTitle)">
+                <input type="date" id="date"
+                    min="${new Date().toISOString().split('T')[0]}"
+                    onchange="reloadBookedSeats(currentMovieTitle)">
             </div>
+
+            <!-- suất chiếu -->
             <div class="form-group">
                 <label><i class="fa-solid fa-clock"></i> Chọn suất chiếu:</label>
                 <select id="showtime" onchange="reloadBookedSeats(currentMovieTitle)">
@@ -654,39 +653,86 @@ function showBooking(movieId, movieTitle) {
                     <option>16:30</option>
                     <option>19:00</option>
                     <option>21:30</option>
-                    <option>25:00</option>
-                    <option>36:67</option>
                 </select>
             </div>
+
+            <!-- ghế -->
             <div class="form-group">
-                <label><i class="fa-solid fa-couch"></i> Chọn ghế (<span id="seatCount">0</span> ghế):</label>
-                <div style="text-align: center; margin: 1rem 0; padding: 1rem; background: var(--cold-border); border-radius: 10px; font-weight: bold; font-size: 1.1rem;">
+                <label>
+                    <i class="fa-solid fa-couch"></i>
+                    Chọn ghế (<span id="seatCount">0</span> ghế):
+                </label>
+
+                <div style="text-align:center;margin:1rem 0;padding:1rem;background:var(--cold-border);border-radius:10px;font-weight:bold">
                     <i class="fa-solid fa-display"></i> MÀN HÌNH
                 </div>
+
                 <div class="seat-selection" id="seatSelection"></div>
-                <div class="seat-legend">
-                    <div class="legend-item">
-                        <div class="legend-box" style="background: rgba(255, 255, 255, 0.1); border: 2px solid var(--cold-border);"></div>
-                        <span>Trống</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-box" style="background: var(--cold-accent);"></div>
-                        <span>Đã chọn</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-box" style="background: #555;"></div>
-                        <span>Đã đặt</span>
-                    </div>
+            </div>
+
+            <!-- voucher -->
+            <div class="form-group">
+                <label><i class="fa-solid fa-tag"></i> Voucher:</label>
+                <div style="display:flex; gap:0.5rem">
+                    <input type="text" id="voucherInput" placeholder="Nhập mã voucher">
+                    <button class="btn btn-secondary" onclick="applyVoucher()">Áp dụng</button>
                 </div>
+                <small id="voucherMsg" style="color:#7dd3fc"></small>
             </div>
-            <div style="margin-top: 1.5rem; padding: 1rem; background: var(--cold-main); border-radius: 10px; font-size: 1.3rem; color: white; font-weight: bold; text-align: center;">
-                <i class="fa-solid fa-wallet"></i> Tổng tiền: <span id="totalPrice">0</span> VNĐ
+
+            <!-- tổng tiền -->
+            <div style="margin-top:1.5rem;padding:1rem;background:var(--cold-main);border-radius:10px;font-size:1.3rem;font-weight:bold;text-align:center">
+                <i class="fa-solid fa-wallet"></i>
+                Tổng tiền: <span id="totalPrice">0</span> VNĐ
             </div>
-            <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="window.confirmBooking('${movieTitle.replace(/'/g, "\\'")}')"><i class="fa-solid fa-check"></i> Xác nhận đặt vé</button>
+
+            <button class="btn btn-primary" style="width:100%;margin-top:1rem"
+                onclick="window.confirmBooking('${movieTitle.replace(/'/g, "\\'")}')">
+                <i class="fa-solid fa-check"></i> Xác nhận đặt vé
+            </button>
         </div>
     `;
 
     generateSeats();
+}
+
+function applyVoucher() {
+    const code = document.getElementById('voucherInput').value.trim().toUpperCase();
+    const msg = document.getElementById('voucherMsg');
+
+    const voucher = vouchers.find(v => v.code === code);
+
+    if (!voucher) {
+        msg.textContent = 'Voucher không hợp lệ';
+        return;
+    }
+
+    let total = baseTotal;
+
+    if (voucher.type === 'fixed') {
+        if (voucher.minOrder && total < voucher.minOrder) {
+            msg.textContent = `Đơn tối thiểu ${voucher.minOrder.toLocaleString()} VNĐ`;
+            return;
+        }
+        total -= voucher.value;
+    }
+
+    if (voucher.type === 'percent') {
+        total -= total * voucher.value / 100;
+    }
+
+    if (voucher.type === 'gift') {
+        msg.textContent = `${voucher.desc}`;
+        appliedVoucher = voucher;
+        return;
+    }
+
+    total = Math.max(0, Math.floor(total));
+    finalTotal = total;
+    appliedVoucher = voucher;
+
+    document.getElementById('totalPrice').textContent = total.toLocaleString();
+    msg.textContent = `Áp dụng: ${voucher.desc}`;
 }
 
 function bookTicket(movieId, movieTitle) {
@@ -773,9 +819,11 @@ function toggleSeat(seatId) {
 }
 
 function updateTotalPrice() {
-    const pricePerSeat = 75000;
-    const total = selectedSeats.length * pricePerSeat;
-    document.getElementById('totalPrice').textContent = total.toLocaleString();
+    baseTotal = selectedSeats.length * 75000;
+    finalTotal = baseTotal;
+
+    document.getElementById('totalPrice').textContent =
+        baseTotal.toLocaleString();
 }
 
 function confirmBooking(movieTitle) {
@@ -1135,7 +1183,7 @@ function addVoucher() {
 }
 
 function deleteVoucher(index) {
-    if (confirm('❓ Bạn có chắc muốn xóa voucher này?')) {
+    if (confirm('Bạn có chắc muốn xóa voucher này?')) {
         vouchers.splice(index, 1);
         showAlert('Đã xóa voucher!');
         manageVouchers();
@@ -1173,16 +1221,16 @@ function manageConcessions() {
                     `).join('')}
                 </tbody>
             </table>
-            
-            <div style="margin-top: 2rem; padding: 2rem; background: rgba(11, 146, 224, 0.1); border-radius: 10px;">
+
+            <div class="add-food" style="margin-top: 2rem; padding: 2rem;">
                 <h3><i class="fa-solid fa-plus"></i> Thêm món mới</h3>
                 <div class="form-group">
                     <label>Tên món:</label>
-                    <input type="text" id="newConcessionName" placeholder="VD: Nachos phô mai">
+                    <input type="text" id="newConcessionName" placeholder="Ví dụ: Bánh Tráng Nướng Đà Lạt quê tôi">
                 </div>
                 <div class="form-group">
                     <label>Giá (VNĐ):</label>
-                    <input type="number" id="newConcessionPrice" placeholder="VD: 50000">
+                    <input type="number" id="newConcessionPrice" placeholder="Ví dụ: 36.000VNĐ">
                 </div>
                 <button class="btn btn-primary" onclick="window.addConcession()"><i class="fa-solid fa-check"></i> Thêm món</button>
             </div>
@@ -1205,7 +1253,7 @@ function editConcession(index) {
 }
 
 function deleteConcession(index) {
-    if (confirm('❓ Bạn có chắc muốn xóa món này?')) {
+    if (confirm('Bạn có chắc muốn xóa món này?')) {
         concessions.splice(index, 1);
         showAlert('Đã xóa món!');
         manageConcessions();
@@ -1300,9 +1348,6 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-
-
-
 // ========== Expose Functions to Window ==========
 window.login = login;
 window.logout = logout;
@@ -1337,3 +1382,4 @@ window.showRegister = showRegister;
 window.closeAuthModal = closeAuthModal;
 window.isLoggedIn = isLoggedIn;
 window.promptLogin = promptLogin;
+window.applyVoucher = applyVoucher;

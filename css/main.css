@@ -201,15 +201,20 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 40px;
+    gap: 10px;
+    padding: 60px;
     font-size: 1.1rem;
-} */
+}
 
 .loading i {
-    font-size: 2rem;
+    font-size: 2.2rem;
     color: var(--cold-main);
 }
+
+.loading-text {
+    opacity: 0.8;
+}
+
 
 /* ========== Genre Filter ========== */
 .genre-filter {
@@ -671,9 +676,11 @@ body {
 
 /* ========== Admin Dashboard ========== */
 .admin-dashboard {
-    max-width: 1400px;
-    margin: 2rem auto;
-    padding: 0 2rem;
+    /* max-width: 1400px; */
+    width: 100%;
+    min-height: 100vh;
+    /* margin: 2rem auto; */
+    padding: 2rem 3rem;
 }
 
 .admin-stats {
@@ -716,6 +723,7 @@ body {
     padding: 2rem;
     border-radius: 15px;
     margin-bottom: 2rem;
+    margin-top: 1.5rem;
     /* border: 2px solid var(--cold-border); */
 }
 
@@ -732,35 +740,87 @@ body {
 /* ========== Orders Table ========== */
 .orders-table {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-    overflow-x: hidden;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
+    border-collapse: separate;
+    border-spacing: 0;
+    /* margin-top: 1.5rem; */
+
+    background: linear-gradient(
+        180deg,
+        rgba(15, 23, 42, 0.9),
+        rgba(15, 23, 42, 0.6)
+    );
+
+    border-radius: 16px;
     overflow: hidden;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.35),
+        inset 0 0 0 1px rgba(125, 211, 252, 0.08);
 }
 
-.orders-table th {
-    padding: 1rem;
+/* ===== TABLE HEADER ===== */
+.orders-table thead th {
+    padding: 1.1rem 1.2rem;
     text-align: left;
-    background: linear-gradient(135deg, #1f3c88, #162447);
-    color: #7dd3fc; /* xanh lạnh */
-    border-bottom: 1px solid rgba(125, 211, 252, 0.2);
-    background: #0f172a;
-    color: #e0f2fe;
-    font-weight: bold;
+
+    background: linear-gradient(
+        135deg,
+        #0f172a,
+        #020617
+    );
+
+    color: var(--cold-main);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+
+    border-bottom: 1px solid rgba(125, 211, 252, 0.15);
 }
 
-.orders-table td {
+/* ===== TABLE BODY ===== */
+.orders-table tbody td {
+    padding: 1rem 1.2rem;
     color: #e0f2fe;
+    font-size: 0.95rem;
+
+    border-bottom: 1px solid rgba(148, 163, 184, 0.08);
 }
 
-.orders-table tr:hover {
-    background: rgba(125, 211, 252, 0.08);
+/* zebra striping */
+.orders-table tbody tr:nth-child(even) {
+    background: rgba(125, 211, 252, 0.03);
+}
+
+/* hover */
+.orders-table tbody tr {
+    transition: all 0.25s ease;
+}
+
+.orders-table tbody tr:hover {
+    background: rgba(125, 211, 252, 0.12);
+    transform: scale(1.002);
+}
+
+/* ===== FIRST & LAST COLUMN BO BO TRÒN ===== */
+.orders-table thead th:first-child {
+    border-top-left-radius: 16px;
+}
+
+.orders-table thead th:last-child {
+    border-top-right-radius: 16px;
+}
+
+.orders-table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 16px;
+}
+
+.orders-table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 16px;
 }
 
 .price-cold {
-    color: #38bdf8; /* xanh lạnh */
+    color: var(--cold-main);
     font-weight: bold;
 }
 
@@ -787,6 +847,76 @@ body {
     color: #e74c3c;
 }
 
+.add-food {
+    padding: 2rem;
+
+    background: linear-gradient(
+        135deg,
+        rgba(59, 130, 246, 0.12),
+        rgba(30, 64, 175, 0.12)
+    );
+
+    border-radius: 16px;
+    border: 1px solid rgba(125, 211, 252, 0.15);
+
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.25),
+        inset 0 0 0 1px rgba(125, 211, 252, 0.05);
+}
+
+.add-food h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: var(--cold-main);
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+/* ===== FORM ===== */
+.add-food .form-group {
+    margin-bottom: 1.2rem;
+}
+
+.add-food label {
+    display: block;
+    margin-bottom: 0.4rem;
+    color: #e0f2fe;
+    font-size: 0.9rem;
+}
+
+.add-food input {
+    width: 100%;
+    padding: 0.65rem 0.8rem;
+
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(125, 211, 252, 0.2);
+    border-radius: 10px;
+
+    color: #e0f2fe;
+    font-size: 0.95rem;
+
+    transition: all 0.25s ease;
+}
+
+.add-food input::placeholder {
+    color: rgba(224, 242, 254, 0.4);
+}
+
+.add-food input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+
+/* ===== BUTTON ===== */
+.add-food .btn {
+    margin-top: 0.5rem;
+    width: fit-content;
+    padding: 0.6rem 1.4rem;
+    font-weight: 600;
+    border-radius: 12px;
+}
 /* ========== Loading ========== */
 .loading {
     text-align: center;
