@@ -561,9 +561,6 @@ function updateNavButtons() {
             <button class="btn">
                 <i class="fa-solid fa-home"></i> Trang chủ
             </button>
-            <button class="btn">
-                <i class="fa-solid fa-ticket"></i> Khuyến mãi
-            </button>
             <button class="btn btn-primary" id="loginRedirect">
                 <i class="fa-solid fa-right-to-bracket"></i> Đăng nhập
             </button>
@@ -1230,7 +1227,7 @@ function manageConcessions() {
                 </div>
                 <div class="form-group">
                     <label>Giá (VNĐ):</label>
-                    <input type="number" id="newConcessionPrice" placeholder="Ví dụ: 36.000VNĐ">
+                    <input type="number" id="newConcessionPrice" placeholder="Ví dụ: 49.000VNĐ">
                 </div>
                 <button class="btn btn-primary" onclick="window.addConcession()"><i class="fa-solid fa-check"></i> Thêm món</button>
             </div>

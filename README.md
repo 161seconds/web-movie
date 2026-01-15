@@ -3,6 +3,14 @@ Web đặt vé xem phim, đặt bắp nước, giao diện cold color theme, có
 ---
 
 ## Tính năng chính
+- Tài khoản demo:
+- Admin:
+- username: admin
+- password: 123
+
+- User:
+- username: user
+- password: 123
 
 ### Người dùng
 - Đăng nhập User / Admin.
@@ -13,7 +21,8 @@ Web đặt vé xem phim, đặt bắp nước, giao diện cold color theme, có
 - Đặt vé chọn ghế.
 - Đặt bắp nước.
 - Xem đơn hàng của mình.
-- Copy voucher khuyến mãi.
+- Copy voucher.
+- Sử dụng voucher.
 
 ### Admin
 - Dashboard thống kê.
@@ -33,8 +42,8 @@ Web đặt vé xem phim, đặt bắp nước, giao diện cold color theme, có
 
 ## Công nghệ sử dụng
 - HTML5.
-- CSS3 (Flexbox, Grid, Linear Gradient).
-- JavaScript (Vanilla JS).
+- CSS3.
+- JavaScript.
 - Font Awesome.
 - TMDB API.
 
@@ -45,12 +54,3 @@ Web đặt vé xem phim, đặt bắp nước, giao diện cold color theme, có
 ### Clone repo
 ```bash
 git clone https://github.com/161seconds/web-movie.git
-
-Tài khoản demo:
-Admin:
-username: admin
-password: 123
-
-User:
-username: user
-password: 123
